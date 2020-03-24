@@ -1,0 +1,12 @@
+[
+ {
+    "EndpointName": "UNO-2484G",
+    "EndpointUrl": "opc.tcp://172.16.12.130:51210/UA/SampleServer",
+    "OpcNodes": [
+      {
+        "Id": "i=2254",
+        "DisplayName": "ServerArray"
+      }
+    ]
+ }
+]

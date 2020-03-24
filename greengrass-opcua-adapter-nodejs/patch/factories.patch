@@ -1,0 +1,13 @@
+diff --git a/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/lib/misc/factories.js b/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/lib/misc/factories.js
+index 008013b..84be39f 100644
+--- a/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/lib/misc/factories.js
++++ b/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/lib/misc/factories.js
+@@ -106,7 +106,7 @@ function registerObject(schema, optional_folder) {
+         code_generator_is_newer = (generated_source_mtime <= code_generator_script_mtime );
+ 
+     }
+-    var generated_source_is_outdated = (!generated_source_exists || code_generator_is_newer || schema_file_is_newer);
++    var generated_source_is_outdated = (!generated_source_exists);
+ 
+ 
+     if (generated_source_is_outdated) {
