@@ -148,8 +148,10 @@ function configInit(serverConfigs, callback) {
             var serverConfig = {
                 server: {
                     name: "",
-                    url: ""
+                    url: "",
+                    certExist:0
                 },
+                userIdentity: null,
                 subscriptions: [],
                 connection: false
             };
@@ -164,6 +166,15 @@ function configInit(serverConfigs, callback) {
             console.log("[%s] serverConfig.subscriptions node length:" + serverConfig.subscriptions.length, configInit.name);
             serverConfig.server.url = config.EndpointUrl;
             serverConfig.server.name = config.EndpointName;
+
+            // set default is certificate mode if user didn't set CertExist in published_nodes.json
+            if (config.CertExist === undefined || config.CertExist === null ) {
+                serverConfig.server.certExist = 1;
+            } else {
+                serverConfig.server.certExist = config.CertExist;
+            }
+            console.log("[%s] serverConfig.server.certExist: " + serverConfig.server.certExist, configInit.name);
+            serverConfig.server.userIdentity = config.userIdentity;
             serverConfigs.push(serverConfig);
             LastModifiedtime = serverFileLastModifyTime;
         });

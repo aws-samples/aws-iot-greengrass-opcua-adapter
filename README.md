@@ -108,29 +108,46 @@ You could setup many OPC\-UA servers concurrently.
    Modify the field `EndpointUrl` in the file `published_nodes.json` in config folder which contain the server IP and Port that you want to connect to, as well as the node Ids you would like to monitor\. Here's the example:
 
    ```json
-    [
-     {
-        "EndpointName": "UNO-2484G",
-        "EndpointUrl": "opc.tcp://localhost:26543",
-        "OpcNodes": [
-        {
+   [
+      {
+         "EndpointName": "UNO-1372G",
+         "EndpointUrl": "opc.tcp://localhost:26543",
+         "CertExist": 1,
+         "userIdentity":
+         {
+            "userName":"user1",
+            "password":"password1"
+         },
+         "OpcNodes": [
+            {
             "Id": "ns=1;s=Temperature",
             "DisplayName": "M140001"
-        },
-        {
+            },
+            {
             "Id": "ns=1;s=FanSpeed",
             "DisplayName": "M140002"
-        },
-        {
+            },
+            {
             "Id": "ns=1;s=PumpSpeed",
             "DisplayName": "M140003"
-        }
-        ]
-     }
-    ]
+            }
+         ]
+      }
+   ]
    ```
 
    In this case, we are connecting to an OPC\-UA server running on the same host as our Greengrass Core, on port 26543, and monitoring multiple nodes that has an OPC\-UA Id `'ns=1;s=Temperature'`, `'ns=1;s=FanSpeed'`, and `'ns=1;s=PumpSpeed'`\.
+
+   Besides, There are two additional configuration for OPC-UA Server:
+   + CertExist: This is a configuration that support certificate validation or not. The OPC-UA adapter will not validtate the OPC-UA server's certificate if this flag set to ```0```, otherwise it will go to check the certificate from the OPC-UA server.
+   + userIdentity: This is a configuration to support user identity mechanism from the OPC-UA server. Please fill in the userName and password recognized between the OPC-UA adapter and the OPC-UA server.
+   ```json
+   "userIdentity":
+    {
+      "userName":"user1",
+      "password":"password1"
+    }
+   ```
 
 3. Configure to authenticate trusted server
 

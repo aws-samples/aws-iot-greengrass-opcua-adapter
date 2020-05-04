@@ -69,21 +69,39 @@ class OPCUASubscriber {
 
 
     createSession() {
-        const userIdentity = null;
+        var userIdentity = null;
         const self = this;
+        console.log("createSession: config.userIdentity: " + self._serverConfig.userIdentity);
+        if (self._serverConfig.userIdentity) {
+            console.log('self._serverConfig.userIdentity.userName:' + self._serverConfig.userIdentity.userName);
+            console.log('self._serverConfig.userIdentity.password:' + self._serverConfig.userIdentity.password);
+            if (self._serverConfig.userIdentity.userName && 
+                self._serverConfig.userIdentity.password) {
+                userIdentity = self._serverConfig.userIdentity;
+            }
+        } else {
+            console.log('self._serverConfig.userIdentity not exist');
+        }
+
         self._client.createSession(userIdentity, (createSessionError, session) => {
             if (!createSessionError) {
                 self._session = session;
                 console.log('Session created');
                 console.log('SessionId: ', session.sessionId.toString());
+                console.log('self._serverConfig.certExist: ', self._serverConfig.certExist);
 
-                var result = ConfigAgent.compareWithTrustCert(session.serverCertificate);
-                console.log("cert compare result: " + result);
-
-                if (result === false) {
-                    createSessionError = new Error("Server certificate not in our trust list ");
-                } else {
+                // feature to support non-certificate OPCUA Server
+                if (self._serverConfig.certExist === 0) {
                     self.emit('session_create');
+                } else {
+                    var result = ConfigAgent.compareWithTrustCert(session.serverCertificate);
+                    console.log("cert compare result: " + result);
+
+                    if (result === false) {
+                        createSessionError = new Error("Server certificate not in our trust list ");
+                    } else {
+                        self.emit('session_create');
+                    }
                 }
             }
 
@@ -149,6 +167,7 @@ class OPCUASubscriber {
                 const nodeId = monitoredItem.itemToMonitor.nodeId.toString();
                 const payload = {
                     id: nodeId,
+                    displayName: monitoredNodeName,
                     timestamp: time,
                     value: dataValue.value,
                 };

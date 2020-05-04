@@ -2,6 +2,12 @@
  {
     "EndpointName": "UNO-2484G",
     "EndpointUrl": "opc.tcp://172.16.12.130:51210/UA/SampleServer",
+    "CertExist": 1,
+    "userIdentity":
+    {
+      "userName":"user1",
+      "password":"password1"
+    },
     "OpcNodes": [
       {
         "Id": "i=2254",
