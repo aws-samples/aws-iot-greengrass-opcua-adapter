@@ -41,7 +41,16 @@ class OPCUASubscriber {
         this.on('subscribe', () => {
             self.monitorNodes();
         }); 
-    }   
+
+        // This is reconnection mechanism inside the OPCUAClient, and
+        // There's already a default handle function in OPCUAClient
+        // class as a prototype, what I modify here is to override it to
+        // fit our architecture.
+        client._on_connection_reestablished  = function (callback) {
+            console.log(" client._on_connection_reestablished".bgWhite.red);
+            self.emit('connect');
+        }
+    }
 
     connect() {
         const self = this;
