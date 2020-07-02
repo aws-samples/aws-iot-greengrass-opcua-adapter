@@ -180,8 +180,9 @@ class OPCUASubscriber {
                     timestamp: time,
                     value: dataValue.value,
                 };
-
-                const topic = `/opcua/${serverName}/node/${monitoredNodeName}`;
+                const awsServerName = serverName.replace(/\#|\?|\+/g,'');
+                const awsNodeName = monitoredNodeName.replace(/\#|\?|\+/g,'');
+                const topic = `/opcua/${awsServerName}/node/${awsNodeName}`;
                 const payloadStr = JSON.stringify(payload);
                 IoTDevice.publish(
                     {
