@@ -162,6 +162,16 @@ function updateConfig()
             dumpServerInfo(ConfigAgent.ReServerConfigs);
             ConfigAgent.ReServerConfigs = [];
         }
+        else
+        {
+            // there's no any configuration, disconnect all connected device
+            // subscriber and clear the OPCUASubscriberSet
+            let index = 0;
+            for (index = 0; index < OPCUASubscriberSet.length; index += 1) {
+                OPCUASubscriberSet[index].disconnect();
+            }
+            clearArray(OPCUASubscriberSet);
+        }
     });
 }
 
