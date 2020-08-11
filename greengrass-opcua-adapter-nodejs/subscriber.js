@@ -34,13 +34,13 @@ class OPCUASubscriber {
         const self = this;
         this.on('connect', () => {
             self.createSession();
-        }); 
+        });
         this.on('session_create', () => {
             self.createSubscription();
-        }); 
+        });
         this.on('subscribe', () => {
             self.monitorNodes();
-        }); 
+        });
 
         // This is reconnection mechanism inside the OPCUAClient, and
         // There's already a default handle function in OPCUAClient
@@ -58,10 +58,10 @@ class OPCUASubscriber {
             if (connectError) {
                 console.log('Got an error connecting to ', self._serverConfig.url, ' Err: ', connectError);
                 return;
-            }  
+            }
             self.emit('connect');
-        }); 
-    }   
+        });
+    }
 
     disconnect() {
         const self = this;
@@ -74,7 +74,7 @@ class OPCUASubscriber {
                 self.emit('disconnect');
             }
         });
-    }   
+    }
 
 
     createSession() {
@@ -84,7 +84,7 @@ class OPCUASubscriber {
         if (self._serverConfig.userIdentity) {
             console.log('self._serverConfig.userIdentity.userName:' + self._serverConfig.userIdentity.userName);
             console.log('self._serverConfig.userIdentity.password:' + self._serverConfig.userIdentity.password);
-            if (self._serverConfig.userIdentity.userName && 
+            if (self._serverConfig.userIdentity.userName &&
                 self._serverConfig.userIdentity.password) {
                 userIdentity = self._serverConfig.userIdentity;
             }
@@ -182,7 +182,7 @@ class OPCUASubscriber {
                 };
                 const awsServerName = serverName.replace(/\#|\?|\+/g,'');
                 const awsNodeName = monitoredNodeName.replace(/\#|\?|\+/g,'');
-                const topic = `/opcua/${awsServerName}/node/${awsNodeName}`;
+                const topic = `opcua/${awsServerName}/node/${awsNodeName}`;
                 const payloadStr = JSON.stringify(payload);
                 IoTDevice.publish(
                     {
