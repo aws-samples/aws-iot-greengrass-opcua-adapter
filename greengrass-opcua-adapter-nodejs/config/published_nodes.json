@@ -1,18 +1,23 @@
-[
- {
-    "EndpointName": "UNO-2484G",
-    "EndpointUrl": "opc.tcp://172.16.12.130:51210/UA/SampleServer",
-    "CertExist": 1,
-    "userIdentity":
-    {
-      "userName":"user1",
-      "password":"password1"
-    },
-    "OpcNodes": [
+{
+  "serInfo": [
       {
-        "Id": "i=2254",
-        "DisplayName": "ServerArray"
+          "EndpointName": "UNO-2484G",
+          "EndpointUrl": "opc.tcp://localhost:49230",
+          "CertExist": 0,
+          "userIdentity": {
+              "userName": "",
+              "password": ""
+          },
+          "OpcNodes": [
+              {
+                  "Id": "ns=2;#SYS_UPTIME",
+                  "DisplayName": "#SYS_UPTIME"
+              },
+              {
+                  "Id": "ns=2;#SYS_CURRENT_TIME",
+                  "DisplayName": "#SYS_CURRENT_TIME"
+              }
+          ]
       }
-    ]
- }
-]
+  ]
+}

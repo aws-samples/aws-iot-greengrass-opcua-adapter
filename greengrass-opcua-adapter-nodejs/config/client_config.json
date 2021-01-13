@@ -6,6 +6,8 @@
       "initialDelay":2000,
       "maxDelay":10000
     },
-    "checkServerConfigInterval":1000
+    "checkServerConfigInterval":1000,
+    "reportStatus":"false",
+    "reportTolerance":5
  }
 ]

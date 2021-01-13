@@ -27,8 +27,12 @@ const serverConfigfileName = 'published_nodes.json';
 const clientConfigfileName = 'client_config.json';
 const certConfigName = 'cert_config.json';
 const systemStatus = 'system_status.txt';
-const folder = '/etc/greengrass/opcua-adapter/config';
+//const folder = '/etc/greengrass/opcua-adapter/config';
+const folder = './config';
 
+var readFailTolerance = 3;
+var readFailTimes = 0;
+var reportStatus = false;
 
 var LastModifiedtime = "";
 
@@ -100,6 +104,8 @@ function configInit(serverConfigs, callback) {
             clientOptions.connectionStrategy.initialDelay = configList[i].connectionStrategy.initialDelay;
             clientOptions.connectionStrategy.maxDelay = configList[i].connectionStrategy.maxDelay;
             clientOptions.checkServerConfigInterval = configList[i].checkServerConfigInterval;
+            readFailTolerance = configList[i].reportTolerance;
+            reportStatus = configList[i].reportStatus;
 
             console.log("[%s] configList[%d].keepSessionAlive: " + configList[i].keepSessionAlive, configInit.name, i);
             console.log("[%s] configList[%d].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry, configInit.name, i);
@@ -130,7 +136,7 @@ function configInit(serverConfigs, callback) {
         var stats = fs.statSync(`${folder}/${serverConfigfileName}`);
         var serverFileLastModifyTime = stats.mtime;
 
-        configList.forEach((config)=> {
+        configList["serInfo"].forEach((config)=> {
             if (isEmptyOrWhitespace(config.EndpointName)) {
                 console.log("invalid EndpointName");
                 return;
@@ -197,9 +203,10 @@ function reportSystemStatus() {
     var seconds = dateObject.getSeconds();
     fs.writeFile(`${folder}/${systemStatus}`, seconds, function (error) {
         if (error) {
-            console.log("Failed to write system time to " + folder + ": " + error);
+            readFailTimes ++;
+            console.log("Failed to write system time to " + folder + ": " + error + "times:" + readFailTimes);
         } else {
-            console.log("System time written in " + folder + "successfully");
+            console.log("System time written in " + folder + " successfully");
         }
     });
 }
@@ -225,8 +232,12 @@ function checkFileLoop(callback) {
         // check server file config file
         var stats = fs.statSync(`${folder}/${serverConfigfileName}`);
         var mtime = stats.mtime;
-        //update process running status
-        reportSystemStatus();
+
+        /* update process running status if the feature is set and failure time less than readFailTolerance. */
+        if ( reportStatus == "true" && readFailTimes < readFailTolerance )
+        {
+            reportSystemStatus();
+        }
 
         // File modified due to different date
         if (!datesEqual(mtime, LastModifiedtime)) {
