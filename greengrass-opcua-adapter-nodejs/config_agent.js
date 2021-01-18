@@ -27,8 +27,7 @@ const serverConfigfileName = 'published_nodes.json';
 const clientConfigfileName = 'client_config.json';
 const certConfigName = 'cert_config.json';
 const systemStatus = 'system_status.txt';
-//const folder = '/etc/greengrass/opcua-adapter/config';
-const folder = './config';
+const folder = '/etc/greengrass/opcua-adapter/config';
 
 var readFailTolerance = 3;
 var readFailTimes = 0;
@@ -107,11 +106,11 @@ function configInit(serverConfigs, callback) {
             readFailTolerance = configList[i].reportTolerance;
             reportStatus = configList[i].reportStatus;
 
-            console.log("[%s] configList[%d].keepSessionAlive: " + configList[i].keepSessionAlive, configInit.name, i);
-            console.log("[%s] configList[%d].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry, configInit.name, i);
-            console.log("[%s] configList[%d].connectionStrategy.initialDelay: " + configList[i].connectionStrategy.initialDelay, configInit.name, i);
-            console.log("[%s] configList[%d].connectionStrategy.maxDelay: " + configList[i].connectionStrategy.maxDelay, configInit.name, i);
-            console.log("[%s] configList[%d].checkServerConfigInterval: " + configList[i].checkServerConfigInterval, configInit.name, i);
+            console.log( configInit.name + ":configList["+ i + "].keepSessionAlive: " + configList[i].keepSessionAlive);
+            console.log( configInit.name + ":configList["+ i + "].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry);
+            console.log( configInit.name + ":configList["+ i + "].connectionStrategy.initialDelay: " + configList[i].connectionStrategy.initialDelay);
+            console.log( configInit.name + ":configList["+ i + "].connectionStrategy.maxDelay: " + configList[i].connectionStrategy.maxDelay);
+            console.log( configInit.name + ":configList["+ i + "].checkServerConfigInterval: " + configList[i].checkServerConfigInterval);
         }
     });
 
@@ -125,7 +124,8 @@ function configInit(serverConfigs, callback) {
         }
 
         certConfig.CertPath = configList[0].CertPath;
-        console.log("[%s] configList[0].CertPath: " + configList[0].CertPath, configInit.name);
+
+        console.log( configInit.name + ":configList[0].CertPath: " + configList[0].CertPath);
 
     });
 
@@ -161,15 +161,15 @@ function configInit(serverConfigs, callback) {
                 subscriptions: [],
                 connection: false
             };
-            console.log("[%s] EndpointName: " + config.EndpointName, configInit.name);
-            console.log("[%s] EndpointUrl: " + config.EndpointUrl, configInit.name);
+            console.log( configInit.name + ": EndpointName: " + config.EndpointName);
+            console.log( configInit.name + ": EndpointUrl: " + config.EndpointUrl);
 
             for (let j = 0; j < config.OpcNodes.length; j += 1) {
                 serverConfig.subscriptions.push(config.OpcNodes[j]);
-                console.log("[%s] serverConfig.subscriptions.Id: " + serverConfig.subscriptions[j].Id, configInit.name);
-                console.log("[%s] serverConfig.subscriptions.DisplayName: " + serverConfig.subscriptions[j].DisplayName, configInit.name);
+                console.log( configInit.name + " serverConfig.subscriptions.Id: " + serverConfig.subscriptions[j].Id);
+                console.log( configInit.name + " serverConfig.subscriptions.DisplayName: " + serverConfig.subscriptions[j].DisplayName);
             }
-            console.log("[%s] serverConfig.subscriptions node length:" + serverConfig.subscriptions.length, configInit.name);
+            console.log( configInit.name + " serverConfig.subscriptions node length:" + serverConfig.subscriptions.length);
             serverConfig.server.url = config.EndpointUrl;
             serverConfig.server.name = config.EndpointName;
 
@@ -179,7 +179,7 @@ function configInit(serverConfigs, callback) {
             } else {
                 serverConfig.server.certExist = config.CertExist;
             }
-            console.log("[%s] serverConfig.server.certExist: " + serverConfig.server.certExist, configInit.name);
+            console.log( configInit.name + " serverConfig.server.certExist: " + serverConfig.server.certExist);
             serverConfig.server.userIdentity = config.userIdentity;
             serverConfigs.push(serverConfig);
             LastModifiedtime = serverFileLastModifyTime;
