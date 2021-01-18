@@ -108,32 +108,33 @@ You could setup many OPC\-UA servers concurrently.
    Modify the field `EndpointUrl` in the file `published_nodes.json` in config folder which contain the server IP and Port that you want to connect to, as well as the node Ids you would like to monitor\. Here's the example:
 
    ```json
-   [
-      {
-         "EndpointName": "UNO-1372G",
-         "EndpointUrl": "opc.tcp://localhost:26543",
-         "CertExist": 1,
-         "userIdentity":
+   {
+      "serInfo": [
          {
-            "userName":"user1",
-            "password":"password1"
-         },
-         "OpcNodes": [
-            {
-            "Id": "ns=1;s=Temperature",
-            "DisplayName": "M140001"
+            "EndpointName": "UNO-1372G",
+            "EndpointUrl": "opc.tcp://localhost:26543",
+            "CertExist": 0,
+            "userIdentity": {
+               "userName": "",
+               "password": ""
             },
-            {
-            "Id": "ns=1;s=FanSpeed",
-            "DisplayName": "M140002"
-            },
-            {
-            "Id": "ns=1;s=PumpSpeed",
-            "DisplayName": "M140003"
-            }
-         ]
-      }
-   ]
+            "OpcNodes": [
+               {
+                  "Id": "ns=1;s=Temperature",
+                  "DisplayName": "M140001"
+               },
+               {
+                  "Id": "ns=1;s=FanSpeed",
+                  "DisplayName": "M140002"
+               },
+               {
+                  "Id": "ns=1;s=PumpSpeed",
+                  "DisplayName": "M140003"
+               }
+            ]
+         }
+      ]
+   }
    ```
 
    In this case, we are connecting to an OPC\-UA server running on the same host as our Greengrass Core, on port 26543, and monitoring multiple nodes that has an OPC\-UA Id `'ns=1;s=Temperature'`, `'ns=1;s=FanSpeed'`, and `'ns=1;s=PumpSpeed'`\.
@@ -148,6 +149,8 @@ You could setup many OPC\-UA servers concurrently.
       "password":"password1"
     }
    ```
+   **Note:**
+   + For the node information output from UA Exeprt, we provide [node converter tool]((./tool/nodeFileParser.py)) to convert it to published_nodes.json.
 
 3. Configure to authenticate trusted server
 
@@ -162,9 +165,13 @@ You could setup many OPC\-UA servers concurrently.
     ```
     Once there's no any certificate matched in the `CertPath`, then the OPC\-UA client wouldn't go on the communication with the OPC\-UA server.
 
-4. Configure json file polling time of Lambda.
-    MOdify the field `checkServerConfigInterval` in client_config.json to adjust the polling interval in mini second of Lambda reading json file.
-
+4. Configure [client_config.json](./config/client_config.json) file:
+   - `checkServerConfigInterval` : polling time of Lambda.
+      - Modify the field `checkServerConfigInterval` in client_config.json to adjust the polling interval in mini second of Lambda reading json file.
+   - `reportStatus`: Report system status.
+      - Used to write counter into a file to let any other cooperative process aware this lambda still works.
+   - `reportTolerance`: Counters to access file to report status.
+      - The access right to the file to report status mmight not correct, use this configuration to prevent system warnings.
     ```json
     [
      {
@@ -174,7 +181,9 @@ You could setup many OPC\-UA servers concurrently.
         "initialDelay":2000,
         "maxDelay":10000
         },
-        "checkServerConfigInterval":1000
+        "checkServerConfigInterval":1000,
+        "reportStatus":"false",
+        "reportTolerance":5
      }
     ]
     ```
