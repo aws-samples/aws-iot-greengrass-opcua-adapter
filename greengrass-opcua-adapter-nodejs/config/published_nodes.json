@@ -1,18 +1,27 @@
-[
- {
-    "EndpointName": "UNO-2484G",
-    "EndpointUrl": "opc.tcp://172.16.12.130:51210/UA/SampleServer",
-    "CertExist": 1,
-    "userIdentity":
-    {
-      "userName":"user1",
-      "password":"password1"
-    },
-    "OpcNodes": [
-      {
-        "Id": "i=2254",
-        "DisplayName": "ServerArray"
-      }
+{
+    "serInfo": [
+       {
+          "endpointName": "UNO-1372G",
+          "endpointUrl": "opc.tcp://localhost:26543",
+          "certExist": false,
+          "userIdentity": {
+             "userName": "",
+             "password": ""
+          },
+          "OpcNodes": [
+             {
+                "id": "ns=1;s=Temperature",
+                "displayName": "M140001"
+             },
+             {
+                "id": "ns=1;s=FanSpeed",
+                "displayName": "M140002"
+             },
+             {
+                "id": "ns=1;s=PumpSpeed",
+                "displayName": "M140003"
+             }
+          ]
+       }
     ]
  }
-]

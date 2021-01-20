@@ -1,0 +1,10 @@
+﻿Tag Name,Address,Data Type,Respect Data Type,Client Access,Scan Rate,Scaling,Raw Low,Raw High,Scaled Low,Scaled High,Scaled Data Type,Clamp Low,Clamp High,Eng Units,Description,Negate Value
+#DISABLE_DEVICE_FE4496BD,#DISABLE_DEVICE_FE4496BD,Default,1,R/W,,,,,,,,,,,,
+#BATCH_WRITE_FE4496BD,#BATCH_WRITE_FE4496BD,Default,1,R/W,,,,,,,,,,,,
+#DEVICE_ERROR_FE4496BD,#DEVICE_ERROR_FE4496BD,Default,1,R/W,,,,,,,,,,,,
+FE4496BD:XAcceleromter_H,FE4496BD:XAcceleromter_H,Default,1,R/W,,,,,,,,,,,,
+FE4496BD:YAcceleromter_H,FE4496BD:YAcceleromter_H,Default,1,R/W,,,,,,,,,,,,
+FE4496BD:ZAcceleromter_H,FE4496BD:ZAcceleromter_H,Default,1,R/W,,,,,,,,,,,,
+FE4496BD:Temperature_H,FE4496BD:Temperature_H,Default,1,R/W,,,,,,,,,,,,
+FE4496BD:XOA_Value_of_V,FE4496BD:XOA_Value_of_V,Default,1,R/W,,,,,,,,,,,,
+FE4496BD:YOA_Value_of_V,FE4496BD:YOA_Value_of_V,Default,1,R/W,,,,,,,,,,,,

@@ -29,6 +29,9 @@ const certConfigName = 'cert_config.json';
 const systemStatus = 'system_status.txt';
 const folder = '/etc/greengrass/opcua-adapter/config';
 
+var readFailTolerance = 3;
+var readFailTimes = 0;
+var reportStatus = false;
 
 var LastModifiedtime = "";
 
@@ -100,12 +103,14 @@ function configInit(serverConfigs, callback) {
             clientOptions.connectionStrategy.initialDelay = configList[i].connectionStrategy.initialDelay;
             clientOptions.connectionStrategy.maxDelay = configList[i].connectionStrategy.maxDelay;
             clientOptions.checkServerConfigInterval = configList[i].checkServerConfigInterval;
+            readFailTolerance = configList[i].reportTolerance;
+            reportStatus = configList[i].reportStatus;
 
-            console.log("[%s] configList[%d].keepSessionAlive: " + configList[i].keepSessionAlive, configInit.name, i);
-            console.log("[%s] configList[%d].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry, configInit.name, i);
-            console.log("[%s] configList[%d].connectionStrategy.initialDelay: " + configList[i].connectionStrategy.initialDelay, configInit.name, i);
-            console.log("[%s] configList[%d].connectionStrategy.maxDelay: " + configList[i].connectionStrategy.maxDelay, configInit.name, i);
-            console.log("[%s] configList[%d].checkServerConfigInterval: " + configList[i].checkServerConfigInterval, configInit.name, i);
+            console.log(configInit.name + ":configList["+ i + "].keepSessionAlive: " + configList[i].keepSessionAlive);
+            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry);
+            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.initialDelay: " + configList[i].connectionStrategy.initialDelay);
+            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.maxDelay: " + configList[i].connectionStrategy.maxDelay);
+            console.log(configInit.name + ":configList["+ i + "].checkServerConfigInterval: " + configList[i].checkServerConfigInterval);
         }
     });
 
@@ -114,12 +119,13 @@ function configInit(serverConfigs, callback) {
             throw err;
         }
 
-        if (isEmptyOrWhitespace(configList[0].CertPath)) {
-            throw new Error("configList[0].CertPath is empty or whitespace");
+        if (isEmptyOrWhitespace(configList[0].certPath)) {
+            throw new Error("configList[0].certPath is empty or whitespace");
         }
 
-        certConfig.CertPath = configList[0].CertPath;
-        console.log("[%s] configList[0].CertPath: " + configList[0].CertPath, configInit.name);
+        certConfig.certPath = configList[0].certPath;
+
+        console.log(configInit.name + ":configList[0].certPath: " + configList[0].certPath);
 
     });
 
@@ -130,14 +136,14 @@ function configInit(serverConfigs, callback) {
         var stats = fs.statSync(`${folder}/${serverConfigfileName}`);
         var serverFileLastModifyTime = stats.mtime;
 
-        configList.forEach((config)=> {
-            if (isEmptyOrWhitespace(config.EndpointName)) {
-                console.log("invalid EndpointName");
+        configList["serInfo"].forEach((config)=> {
+            if (isEmptyOrWhitespace(config.endpointName)) {
+                console.log("invalid endpointName");
                 return;
             }
 
-            if (isEmptyOrWhitespace(config.EndpointUrl)) {
-                console.log("invalid EndpointUrl");
+            if (isEmptyOrWhitespace(config.endpointUrl)) {
+                console.log("invalid endpointUrl");
                 return;
             }
 
@@ -149,31 +155,30 @@ function configInit(serverConfigs, callback) {
                 server: {
                     name: "",
                     url: "",
-                    certExist:0
+                    certExist:false
                 },
                 userIdentity: null,
                 subscriptions: [],
                 connection: false
             };
-            console.log("[%s] EndpointName: " + config.EndpointName, configInit.name);
-            console.log("[%s] EndpointUrl: " + config.EndpointUrl, configInit.name);
-
+            console.log(configInit.name + ": endpointName: " + config.endpointName);
+            console.log(configInit.name + ": endpointUrl: " + config.endpointUrl);
             for (let j = 0; j < config.OpcNodes.length; j += 1) {
                 serverConfig.subscriptions.push(config.OpcNodes[j]);
-                console.log("[%s] serverConfig.subscriptions.Id: " + serverConfig.subscriptions[j].Id, configInit.name);
-                console.log("[%s] serverConfig.subscriptions.DisplayName: " + serverConfig.subscriptions[j].DisplayName, configInit.name);
+                console.log(configInit.name + " serverConfig.subscriptions.id: " + serverConfig.subscriptions[j].id);
+                console.log(configInit.name + " serverConfig.subscriptions.displayName: " + serverConfig.subscriptions[j].displayName);
             }
-            console.log("[%s] serverConfig.subscriptions node length:" + serverConfig.subscriptions.length, configInit.name);
-            serverConfig.server.url = config.EndpointUrl;
-            serverConfig.server.name = config.EndpointName;
+            console.log(configInit.name + " serverConfig.subscriptions node length:" + serverConfig.subscriptions.length);
+            serverConfig.server.url = config.endpointUrl;
+            serverConfig.server.name = config.endpointName;
 
-            // set default is certificate mode if user didn't set CertExist in published_nodes.json
-            if (config.CertExist === undefined || config.CertExist === null ) {
-                serverConfig.server.certExist = 1;
+            // set default is certificate mode if user didn't set certExist in published_nodes.json
+            if ( config.certExist ) {
+                serverConfig.server.certExist = config.certExist
             } else {
-                serverConfig.server.certExist = config.CertExist;
+                serverConfig.server.certExist = false
             }
-            console.log("[%s] serverConfig.server.certExist: " + serverConfig.server.certExist, configInit.name);
+            console.log(configInit.name + " serverConfig.server.certExist: " + serverConfig.server.certExist);
             serverConfig.server.userIdentity = config.userIdentity;
             serverConfigs.push(serverConfig);
             LastModifiedtime = serverFileLastModifyTime;
@@ -197,18 +202,19 @@ function reportSystemStatus() {
     var seconds = dateObject.getSeconds();
     fs.writeFile(`${folder}/${systemStatus}`, seconds, function (error) {
         if (error) {
-            console.log("Failed to write system time to " + folder + ": " + error);
+            readFailTimes ++;
+            console.log("Failed to write system time to " + folder + ": " + error + "times:" + readFailTimes);
         } else {
-            console.log("System time written in " + folder + "successfully");
+            console.log("System time written in " + folder + " successfully");
         }
     });
 }
 
 var compareWithTrustCert = function (serverCert) {
     // read file in the same folder
-    var files = fs.readdirSync(certConfig.CertPath);
+    var files = fs.readdirSync(certConfig.certPath);
     for (let file of files) {
-        let contents = fs.readFileSync(`${certConfig.CertPath}/${file}`);
+        let contents = fs.readFileSync(`${certConfig.certPath}/${file}`);
         if (contents.length === serverCert.length) {
             if (contents.equals(serverCert)) {
                  return true;
@@ -225,8 +231,12 @@ function checkFileLoop(callback) {
         // check server file config file
         var stats = fs.statSync(`${folder}/${serverConfigfileName}`);
         var mtime = stats.mtime;
-        //update process running status
-        reportSystemStatus();
+
+        /* update process running status if the feature is set and failure time less than readFailTolerance. */
+        if ( reportStatus == "true" && readFailTimes < readFailTolerance )
+        {
+            reportSystemStatus();
+        }
 
         // File modified due to different date
         if (!datesEqual(mtime, LastModifiedtime)) {

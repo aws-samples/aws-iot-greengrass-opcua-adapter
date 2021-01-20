@@ -67,7 +67,7 @@ var convertSerConfigToMap = function (arrObj) {
 
     return arrObj.reduce(function(result, current) {
         var subscriptions = current.subscriptions.reduce(function(map, obj) {
-            map[obj.Id] = obj.DisplayName;
+            map[obj.id] = obj.displayName;
             return map;
         }, {});
         result[current.server.name] = result[current.id_0] || {};
@@ -83,7 +83,7 @@ var convertOPCUASubscriberSetToMap = function (arrObj) {
 
     return arrObj.reduce(function(result, current) {
         var subscriptions = current.getNodeConfig().reduce(function(map, obj) {
-            map[obj.Id] = obj.DisplayName;
+            map[obj.id] = obj.displayName;
             return map;
         }, {});
         var server = current.getServerConfig();

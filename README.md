@@ -15,10 +15,10 @@ In this section we will cover the following steps:
 Greengrass implements OPC\-UA as a Lambda function in NodeJS\. Since Lambda functions running on Greengrass cores have access to network resources, you can create Lambda functions that proxy information from your existing OPC\-UA servers over TCP to other functions or services in your Greengrass group\.
 
 Under this architecture, we provide the following additional features for customer to use:
-+ published_nodes\.json, used to configured how many OPC-UA nodes in dedicated OPC-UA server need to be monitored\.
-+ cert_config\.json, used to configure the path of server certificates\.
-+ client_config\.json, used to configure some client options and time interval to check publishednodes.json modification\.
-+ system_status.txt, used to check if the system is alive or not\.
++ [published_nodes\.json](./greengrass-opcua-adapter-nodejs/config/published_nodes.json), used to configured how many OPC-UA nodes in dedicated OPC-UA server need to be monitored\.
++ [cert_config\.json](./greengrass-opcua-adapter-nodejs/config/cert_config.json), used to configure the path of server certificates\.
++ [client_config\.json](./greengrass-opcua-adapter-nodejs/config/client_config.json), used to configure some client options and time interval to check publishednodes.json modification\.
++ [system_status.txt](./greengrass-opcua-adapter-nodejs/config/system_status.txt), used to check if the system is alive or not\.
 
 ![\[Greengrass OPCUA Architecture.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_arch.png)
 
@@ -105,81 +105,95 @@ You could setup many OPC\-UA servers concurrently.
 
 2. Configure the server and monitored nodes
 
-   Modify the field `EndpointUrl` in the file `published_nodes.json` in config folder which contain the server IP and Port that you want to connect to, as well as the node Ids you would like to monitor\. Here's the example:
+   Modify the field `endpointUrl` in the file `published_nodes.json` in config folder which contain the server IP and Port that you want to connect to, as well as the node Ids you would like to monitor\. Here's the example:
 
    ```json
-   [
-      {
-         "EndpointName": "UNO-1372G",
-         "EndpointUrl": "opc.tcp://localhost:26543",
-         "CertExist": 1,
-         "userIdentity":
+   {
+      "serInfo": [
          {
-            "userName":"user1",
-            "password":"password1"
-         },
-         "OpcNodes": [
-            {
-            "Id": "ns=1;s=Temperature",
-            "DisplayName": "M140001"
+            "endpointName": "UNO-1372G",
+            "endpointUrl": "opc.tcp://localhost:26543",
+            "certExist": false,
+            "userIdentity": {
+               "userName": "",
+               "password": ""
             },
-            {
-            "Id": "ns=1;s=FanSpeed",
-            "DisplayName": "M140002"
-            },
-            {
-            "Id": "ns=1;s=PumpSpeed",
-            "DisplayName": "M140003"
-            }
-         ]
-      }
-   ]
+            "OpcNodes": [
+               {
+                  "Id": "ns=1;s=Temperature",
+                  "DisplayName": "M140001"
+               },
+               {
+                  "Id": "ns=1;s=FanSpeed",
+                  "DisplayName": "M140002"
+               },
+               {
+                  "Id": "ns=1;s=PumpSpeed",
+                  "DisplayName": "M140003"
+               }
+            ]
+         }
+      ]
+   }
    ```
 
    In this case, we are connecting to an OPC\-UA server running on the same host as our Greengrass Core, on port 26543, and monitoring multiple nodes that has an OPC\-UA Id `'ns=1;s=Temperature'`, `'ns=1;s=FanSpeed'`, and `'ns=1;s=PumpSpeed'`\.
 
    Besides, There are two additional configuration for OPC-UA Server:
-   + CertExist: This is a configuration that support certificate validation or not. The OPC-UA adapter will not validtate the OPC-UA server's certificate if this flag set to ```0```, otherwise it will go to check the certificate from the OPC-UA server.
+   + certExist: This is a configuration that support certificate validation or not. The OPC-UA adapter will not validtate the OPC-UA server's certificate if this flag set to ```false```, otherwise it will go to check the certificate from the OPC-UA server.
    + userIdentity: This is a configuration to support user identity mechanism from the OPC-UA server. Please fill in the userName and password recognized between the OPC-UA adapter and the OPC-UA server.
    ```json
    "userIdentity":
     {
-      "userName":"user1",
-      "password":"password1"
+      "userName": "user1",
+      "password": "password1"
     }
    ```
+   **Note:**
+   + For the node information output from `Advantech Edgelink`, we provide an node converter tool to convert it to `published_nodes.json`, and the following is the example:
+      + [nodeFileParser.py](./greengrass-opcua-adapter-nodejs/tool/nodeFileParser.py) : The tool to convert the node information file into published_nodes.json.
+      + [sample.csv](./greengrass-opcua-adapter-nodejs/tool/sample.csv) : The node information file generated by Advantech Edgelink.
+      + Commands:
+        ```
+        python3 nodeFileParser.py sample.csv
+        ```
 
 3. Configure to authenticate trusted server
 
-   Modify the field `CertPath` in cert_config\.json, which is used to tell OPC\-UA client the received OPC\-UA Server certificate in Ceritificate List is matched or not:
+   Modify the field `certPath` in cert_config\.json, which is used to tell OPC\-UA client the received OPC\-UA server certificate in Certificate List is matched or not:
 
     ```json
     [
      {
-        "CertPath": "Directory"
+        "certPath": "Directory"
      }
     ]
     ```
-    Once there's no any certificate matched in the `CertPath`, then the OPC\-UA client wouldn't go on the communication with the OPC\-UA server.
+    Once there's no any certificate matched in the `certPath`, then the OPC\-UA client wouldn't go on the communication with the OPC\-UA server.
 
-4. Configure json file polling time of Lambda.
-    MOdify the field `checkServerConfigInterval` in client_config.json to adjust the polling interval in mini second of Lambda reading json file.
-
+4. Configure [client_config.json](./greengrass-opcua-adapter-nodejs/config/client_config.json) file:
+   - `checkServerConfigInterval` : polling time of Lambda.
+      - Modify the field `checkServerConfigInterval` to adjust the polling interval in mini second of Lambda reading json file.
+   - `reportStatus`: Report system status.
+      - Used to write counter into a file to let any other cooperative process aware this lambda still works.
+   - `reportTolerance`: Counters to access file to report status.
+      - The access right to the file to report status might not correct, use this configuration to prevent system warnings.
     ```json
     [
      {
         "keepSessionAlive": "true",
         "connectionStrategy": {
-        "maxRetry":100000,
-        "initialDelay":2000,
-        "maxDelay":10000
+        "maxRetry": 100000,
+        "initialDelay": 2000,
+        "maxDelay": 10000
         },
-        "checkServerConfigInterval":1000
+        "checkServerConfigInterval": 1000,
+        "reportStatus": "false",
+        "reportTolerance": 5
      }
     ]
     ```
 
-    In this case of "checkServerConfigInterval":1000, Lambda function will poll json file once 1 second.
 5. Upload your Lambda
 
    Create a Greengrass Lambda function\. You can find more details on how to do that in [Configure the Lambda Function for AWS IoT Greengrass](https://docs.aws.amazon.com/greengrass/latest/developerguide/config-lambda.htmlconfig-lambda.md)\. In a nutshell, create a Lambda function code archive by doing the following:
