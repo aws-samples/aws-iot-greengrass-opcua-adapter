@@ -2,12 +2,12 @@
  {
     "keepSessionAlive": "true",
     "connectionStrategy": {
-      "maxRetry":100000,
-      "initialDelay":2000,
-      "maxDelay":10000
+      "maxRetry": 100000,
+      "initialDelay": 2000,
+      "maxDelay": 10000
     },
-    "checkServerConfigInterval":1000,
-    "reportStatus":"false",
-    "reportTolerance":5
+    "checkServerConfigInterval": 1000,
+    "reportStatus": "false",
+    "reportTolerance": 5
  }
 ]

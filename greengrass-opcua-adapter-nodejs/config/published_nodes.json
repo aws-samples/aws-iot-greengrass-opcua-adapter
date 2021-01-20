@@ -1,25 +1,25 @@
 {
     "serInfo": [
        {
-          "EndpointName": "UNO-1372G",
-          "EndpointUrl": "opc.tcp://localhost:26543",
-          "CertExist": 0,
+          "endpointName": "UNO-1372G",
+          "endpointUrl": "opc.tcp://localhost:26543",
+          "certExist": false,
           "userIdentity": {
              "userName": "",
              "password": ""
           },
           "OpcNodes": [
              {
-                "Id": "ns=1;s=Temperature",
-                "DisplayName": "M140001"
+                "id": "ns=1;s=Temperature",
+                "displayName": "M140001"
              },
              {
-                "Id": "ns=1;s=FanSpeed",
-                "DisplayName": "M140002"
+                "id": "ns=1;s=FanSpeed",
+                "displayName": "M140002"
              },
              {
-                "Id": "ns=1;s=PumpSpeed",
-                "DisplayName": "M140003"
+                "id": "ns=1;s=PumpSpeed",
+                "displayName": "M140003"
              }
           ]
        }

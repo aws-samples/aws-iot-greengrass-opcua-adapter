@@ -106,11 +106,11 @@ function configInit(serverConfigs, callback) {
             readFailTolerance = configList[i].reportTolerance;
             reportStatus = configList[i].reportStatus;
 
-            console.log( configInit.name + ":configList["+ i + "].keepSessionAlive: " + configList[i].keepSessionAlive);
-            console.log( configInit.name + ":configList["+ i + "].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry);
-            console.log( configInit.name + ":configList["+ i + "].connectionStrategy.initialDelay: " + configList[i].connectionStrategy.initialDelay);
-            console.log( configInit.name + ":configList["+ i + "].connectionStrategy.maxDelay: " + configList[i].connectionStrategy.maxDelay);
-            console.log( configInit.name + ":configList["+ i + "].checkServerConfigInterval: " + configList[i].checkServerConfigInterval);
+            console.log(configInit.name + ":configList["+ i + "].keepSessionAlive: " + configList[i].keepSessionAlive);
+            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry);
+            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.initialDelay: " + configList[i].connectionStrategy.initialDelay);
+            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.maxDelay: " + configList[i].connectionStrategy.maxDelay);
+            console.log(configInit.name + ":configList["+ i + "].checkServerConfigInterval: " + configList[i].checkServerConfigInterval);
         }
     });
 
@@ -119,13 +119,13 @@ function configInit(serverConfigs, callback) {
             throw err;
         }
 
-        if (isEmptyOrWhitespace(configList[0].CertPath)) {
-            throw new Error("configList[0].CertPath is empty or whitespace");
+        if (isEmptyOrWhitespace(configList[0].certPath)) {
+            throw new Error("configList[0].certPath is empty or whitespace");
         }
 
-        certConfig.CertPath = configList[0].CertPath;
+        certConfig.certPath = configList[0].certPath;
 
-        console.log( configInit.name + ":configList[0].CertPath: " + configList[0].CertPath);
+        console.log(configInit.name + ":configList[0].certPath: " + configList[0].certPath);
 
     });
 
@@ -137,13 +137,13 @@ function configInit(serverConfigs, callback) {
         var serverFileLastModifyTime = stats.mtime;
 
         configList["serInfo"].forEach((config)=> {
-            if (isEmptyOrWhitespace(config.EndpointName)) {
-                console.log("invalid EndpointName");
+            if (isEmptyOrWhitespace(config.endpointName)) {
+                console.log("invalid endpointName");
                 return;
             }
 
-            if (isEmptyOrWhitespace(config.EndpointUrl)) {
-                console.log("invalid EndpointUrl");
+            if (isEmptyOrWhitespace(config.endpointUrl)) {
+                console.log("invalid endpointUrl");
                 return;
             }
 
@@ -155,31 +155,30 @@ function configInit(serverConfigs, callback) {
                 server: {
                     name: "",
                     url: "",
-                    certExist:0
+                    certExist:false
                 },
                 userIdentity: null,
                 subscriptions: [],
                 connection: false
             };
-            console.log( configInit.name + ": EndpointName: " + config.EndpointName);
-            console.log( configInit.name + ": EndpointUrl: " + config.EndpointUrl);
-
+            console.log(configInit.name + ": endpointName: " + config.endpointName);
+            console.log(configInit.name + ": endpointUrl: " + config.endpointUrl);
             for (let j = 0; j < config.OpcNodes.length; j += 1) {
                 serverConfig.subscriptions.push(config.OpcNodes[j]);
-                console.log( configInit.name + " serverConfig.subscriptions.Id: " + serverConfig.subscriptions[j].Id);
-                console.log( configInit.name + " serverConfig.subscriptions.DisplayName: " + serverConfig.subscriptions[j].DisplayName);
+                console.log(configInit.name + " serverConfig.subscriptions.id: " + serverConfig.subscriptions[j].id);
+                console.log(configInit.name + " serverConfig.subscriptions.displayName: " + serverConfig.subscriptions[j].displayName);
             }
-            console.log( configInit.name + " serverConfig.subscriptions node length:" + serverConfig.subscriptions.length);
-            serverConfig.server.url = config.EndpointUrl;
-            serverConfig.server.name = config.EndpointName;
+            console.log(configInit.name + " serverConfig.subscriptions node length:" + serverConfig.subscriptions.length);
+            serverConfig.server.url = config.endpointUrl;
+            serverConfig.server.name = config.endpointName;
 
-            // set default is certificate mode if user didn't set CertExist in published_nodes.json
-            if (config.CertExist === undefined || config.CertExist === null ) {
-                serverConfig.server.certExist = 1;
+            // set default is certificate mode if user didn't set certExist in published_nodes.json
+            if ( config.certExist ) {
+                serverConfig.server.certExist = config.certExist
             } else {
-                serverConfig.server.certExist = config.CertExist;
+                serverConfig.server.certExist = false
             }
-            console.log( configInit.name + " serverConfig.server.certExist: " + serverConfig.server.certExist);
+            console.log(configInit.name + " serverConfig.server.certExist: " + serverConfig.server.certExist);
             serverConfig.server.userIdentity = config.userIdentity;
             serverConfigs.push(serverConfig);
             LastModifiedtime = serverFileLastModifyTime;
@@ -213,9 +212,9 @@ function reportSystemStatus() {
 
 var compareWithTrustCert = function (serverCert) {
     // read file in the same folder
-    var files = fs.readdirSync(certConfig.CertPath);
+    var files = fs.readdirSync(certConfig.certPath);
     for (let file of files) {
-        let contents = fs.readFileSync(`${certConfig.CertPath}/${file}`);
+        let contents = fs.readFileSync(`${certConfig.certPath}/${file}`);
         if (contents.length === serverCert.length) {
             if (contents.equals(serverCert)) {
                  return true;

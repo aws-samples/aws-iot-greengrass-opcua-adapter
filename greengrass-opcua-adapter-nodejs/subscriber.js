@@ -153,10 +153,10 @@ class OPCUASubscriber {
     monitorNodes() {
         const self = this;
         self._monitoredItemsConfig.forEach((monitoredNode) => {
-            console.log('monitoring node id = ', monitoredNode.Id);
+            console.log('monitoring node id = ', monitoredNode.id);
             const monitoredItem = this._subscription.monitor(
                 {
-                    nodeId: monitoredNode.Id,
+                    nodeId: monitoredNode.id,
                     attributeId: Opcua.AttributeIds.Value,
                 },
                 {
@@ -170,7 +170,7 @@ class OPCUASubscriber {
                 console.log('monitoredItem initialized');
             });
             monitoredItem.on('changed', (dataValue) => {
-                const monitoredNodeName = monitoredNode.DisplayName;
+                const monitoredNodeName = monitoredNode.displayName;
                 const serverName = self._serverConfig.name;
                 const time = dataValue.sourceTimestamp;
                 const nodeId = monitoredItem.itemToMonitor.nodeId.toString();

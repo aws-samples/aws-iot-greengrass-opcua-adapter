@@ -12,9 +12,9 @@ nodeJsonFile['serInfo'] = []
 # follow the format as follows:   
 # [
 #  {
-#     "EndpointName": "UNO-2484G",
-#     "EndpointUrl": "opc.tcp://localhost:49230",
-#     "CertExist": 0,
+#     "endpointName": "UNO-2484G",
+#     "endpointUrl": "opc.tcp://localhost:49230",
+#     "certExist": false,
 #     "userIdentity":
 #     {
 #       "userName":"user1",
@@ -34,19 +34,19 @@ if len(sys.argv) < 2:
     raise Exception('Please input the file name with path, such as: path/filename ')
 
 
-EndpointName = input("Enter EndpointName: ")
-# Make sure the EndpointName exist
-if len(EndpointName) == 0:
-    raise Exception('Please input the EndpointName')
+endpointName = input("Enter endpointName: ")
+# Make sure the endpointName exist
+if len(endpointName) == 0:
+    raise Exception('Please input the endpointName')
 
-EndpointUrl = input("Enter EndpointUrl: ")
-# Make sure the EndpointUrl exist
-if len(EndpointUrl) == 0:
-    raise Exception('Please input the EndpointUrl')
+endpointUrl = input("Enter endpointUrl: ")
+# Make sure the endpointUrl exist
+if len(endpointUrl) == 0:
+    raise Exception('Please input the endpointUrl')
 
-CertExist = input("Enter CertExist: ")
+certExist = input("Is certExist? Please input yes or no: ")
 
-userIdentitySupport = input("Suppport userIdentity: Enter 'yes' or 'no' ")
+userIdentitySupport = input("Support userIdentity: Enter 'yes' or 'no' ")
 
 if userIdentitySupport == "yes":
     userName = input("Enter userName:")
@@ -55,55 +55,55 @@ else:
     userName = ""
     password = ""
 
-if CertExist == "1":
-    CertExist = 1;
-    print(CertExist)
+if certExist == "yes":
+    certExist = True
+    print(certExist)
 else:
-    CertExist = 0
+    certExist = False
 
 
 print("userName:" + userName )
 print("password:" + password )
 
 # read the csv file and load into json format
-with open(sys.argv[1]) as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    line_count = 0
+with open(sys.argv[1]) as csvＦile:
+    csvReader = csv.reader(csvＦile, delimiter=',')
+    lineCount = 0
     nodeData = {}
     nodeData['OpcNodes']=[]
 
-    for row in csv_reader:
-        if line_count == 0:
+    for row in csvReader:
+        if lineCount == 0:
             print(f'Column names are {", ".join(row)}')
-            line_count += 1
+            lineCount += 1
         else:
             print(f'\t{row[0]} / {row[1]} / {row[2]} ')
-            Id = 'ns=2;' + str(row[0])
+            id = 'ns=2;' + str(row[0])
             nodeData['OpcNodes'].append({
-                'Id':Id,
-                'DisplayName': row[1]
+                'id':id,
+                'displayName': row[1]
             })
             # row[0]: Tag Name 
             # row[1]: Address
             # row[2]: Data Type
-            line_count += 1
+            lineCount += 1
 
-    print(f'Processed {line_count} lines.')
+    print(f'Processed {lineCount} lines.')
     print('nodeData:' + str(nodeData))
 
 # fill in the data into json format
 nodeJsonFile['serInfo'].append(
     {
-        'EndpointName': EndpointName,
-        'EndpointUrl':EndpointUrl,
-        'CertExist':CertExist,
+        'endpointName': endpointName,
+        'endpointUrl':endpointUrl,
+        'certExist':certExist,
         'userIdentity':{
-          'userName':userName,
-          'password':password
+            'userName':userName,
+            'password':password
         },
         'OpcNodes': nodeData['OpcNodes']
     })
 
 # write data into json file in 'Pretty-Printing'
 with open('published_nodes.json', 'w') as outfile:
-  json.dump(nodeJsonFile, outfile, indent=4)
+    json.dump(nodeJsonFile, outfile, indent=4)
