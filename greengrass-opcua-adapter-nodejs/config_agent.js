@@ -76,42 +76,40 @@ function configInit(serverConfigs, callback) {
         if (err) {
             throw err;
         }
-        for (let i = 0; i < configList.length; i += 1) {
 
-            if (isEmpty(configList[i].keepSessionAlive)) {
-                throw new Error("configList[%d].keepSessionAlive is empty or whitespace", i);
-            }
-
-            if (!Number.isInteger(configList[i].connectionStrategy.maxRetry)) {
-                throw new Error("configList[%d].connectionStrategy.maxRetry is not a number", i);
-            }
-
-            if (!Number.isInteger(configList[i].connectionStrategy.initialDelay)) {
-                throw new Error("invalid .connectionStrategy.initialDelay is not a number");
-            }
-
-            if (!Number.isInteger(configList[i].connectionStrategy.maxDelay)) {
-                throw new Error("connectionStrategy.maxDelay is not a number");
-            }
-
-            if (!Number.isInteger(configList[i].checkServerConfigInterval)) {
-                throw new Error("connectionStrategy.maxDelay is not a number");
-            }
-
-            clientOptions.keepSessionAlive = configList[i].keepSessionAlive;
-            clientOptions.connectionStrategy.maxRetry = configList[i].connectionStrategy.maxRetry;
-            clientOptions.connectionStrategy.initialDelay = configList[i].connectionStrategy.initialDelay;
-            clientOptions.connectionStrategy.maxDelay = configList[i].connectionStrategy.maxDelay;
-            clientOptions.checkServerConfigInterval = configList[i].checkServerConfigInterval;
-            readFailTolerance = configList[i].reportTolerance;
-            reportStatus = configList[i].reportStatus;
-
-            console.log(configInit.name + ":configList["+ i + "].keepSessionAlive: " + configList[i].keepSessionAlive);
-            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.maxRetry: " + configList[i].connectionStrategy.maxRetry);
-            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.initialDelay: " + configList[i].connectionStrategy.initialDelay);
-            console.log(configInit.name + ":configList["+ i + "].connectionStrategy.maxDelay: " + configList[i].connectionStrategy.maxDelay);
-            console.log(configInit.name + ":configList["+ i + "].checkServerConfigInterval: " + configList[i].checkServerConfigInterval);
+        if (isEmpty(configList.keepSessionAlive)) {
+            throw new Error("configList.keepSessionAlive is empty or whitespace");
         }
+
+        if (!Number.isInteger(configList.connectionStrategy.maxRetry)) {
+            throw new Error("configList.connectionStrategy.maxRetry is not a number");
+        }
+
+        if (!Number.isInteger(configList.connectionStrategy.initialDelay)) {
+            throw new Error("invalid .connectionStrategy.initialDelay is not a number");
+        }
+
+        if (!Number.isInteger(configList.connectionStrategy.maxDelay)) {
+            throw new Error("connectionStrategy.maxDelay is not a number");
+        }
+
+        if (!Number.isInteger(configList.checkServerConfigInterval)) {
+            throw new Error("connectionStrategy.maxDelay is not a number");
+        }
+
+        clientOptions.keepSessionAlive = configList.keepSessionAlive;
+        clientOptions.connectionStrategy.maxRetry = configList.connectionStrategy.maxRetry;
+        clientOptions.connectionStrategy.initialDelay = configList.connectionStrategy.initialDelay;
+        clientOptions.connectionStrategy.maxDelay = configList.connectionStrategy.maxDelay;
+        clientOptions.checkServerConfigInterval = configList.checkServerConfigInterval;
+        readFailTolerance = configList.reportTolerance;
+        reportStatus = configList.reportStatus;
+
+        console.log(configInit.name + ":configList.keepSessionAlive: " + configList.keepSessionAlive);
+        console.log(configInit.name + ":configList.connectionStrategy.maxRetry: " + configList.connectionStrategy.maxRetry);
+        console.log(configInit.name + ":configList.connectionStrategy.initialDelay: " + configList.connectionStrategy.initialDelay);
+        console.log(configInit.name + ":configList.connectionStrategy.maxDelay: " + configList.connectionStrategy.maxDelay);
+        console.log(configInit.name + ":configList.checkServerConfigInterval: " + configList.checkServerConfigInterval);
     });
 
     jsonFile.readFile(`${folder}/${certConfigName}`, function (err, configList) {
@@ -119,13 +117,13 @@ function configInit(serverConfigs, callback) {
             throw err;
         }
 
-        if (isEmptyOrWhitespace(configList[0].certPath)) {
+        if (isEmptyOrWhitespace(configList.certPath)) {
             throw new Error("configList[0].certPath is empty or whitespace");
         }
 
-        certConfig.certPath = configList[0].certPath;
+        certConfig.certPath = configList.certPath;
 
-        console.log(configInit.name + ":configList[0].certPath: " + configList[0].certPath);
+        console.log(configInit.name + ":configList.certPath: " + configList.certPath);
 
     });
 
