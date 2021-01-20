@@ -181,14 +181,14 @@ You could setup many OPC\-UA servers concurrently.
     ```json
     [
      {
-        "keepSessionAlive": "true",
+        "keepSessionAlive": true,
         "connectionStrategy": {
         "maxRetry": 100000,
         "initialDelay": 2000,
         "maxDelay": 10000
         },
         "checkServerConfigInterval": 1000,
-        "reportStatus": "false",
+        "reportStatus": false,
         "reportTolerance": 5
      }
     ]

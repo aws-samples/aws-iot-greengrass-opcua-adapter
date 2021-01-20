@@ -78,7 +78,7 @@ function configInit(serverConfigs, callback) {
         }
         for (let i = 0; i < configList.length; i += 1) {
 
-            if (isEmptyOrWhitespace(configList[i].keepSessionAlive)) {
+            if (isEmpty(configList[i].keepSessionAlive)) {
                 throw new Error("configList[%d].keepSessionAlive is empty or whitespace", i);
             }
 
@@ -233,7 +233,7 @@ function checkFileLoop(callback) {
         var mtime = stats.mtime;
 
         /* update process running status if the feature is set and failure time less than readFailTolerance. */
-        if ( reportStatus == "true" && readFailTimes < readFailTolerance )
+        if ( reportStatus && readFailTimes < readFailTolerance )
         {
             reportSystemStatus();
         }
