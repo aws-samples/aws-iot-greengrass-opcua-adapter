@@ -4,6 +4,25 @@ import json
 import logging
 import csv
 import demjson
+import argparse
+
+debugLog = False
+
+parser = argparse.ArgumentParser(description='Convert Node csv file to published_nodes.json file.')
+
+parser.add_argument('--inputFile', '-i', type=str, required=True, help="The csv file to be converted.")
+parser.add_argument('--serverName', '-sn', type=str, required=True, help="OPCUA Server Name.")
+parser.add_argument('--endpointURL','-e', type=str, required=True, help="OPCUA Server endpoint URL")
+parser.add_argument('--certExist', action='store_true', default=False,
+                    help='Used to support certificate validation or not')
+parser.add_argument('--userIdentity', action='store_true', default=False,
+                    help='Used to support user identity mechanism from the OPC-UA server')
+parser.add_argument('--userName', type=str, help="userName used when userIdentity support")
+parser.add_argument('--password', type=str, help="password used when userIdentity support")
+
+
+if debugLog:
+    print(parser.parse_args())
 
 
 nodeJsonFile = {}
@@ -29,44 +48,39 @@ nodeJsonFile['serInfo'] = []
 #  }
 # ]
 
-# the file path "MUST" to exist
-if len(sys.argv) < 2:
-    raise Exception('Please input the file name with path, such as: path/filename ')
-
-
-endpointName = input("Enter endpointName: ")
+inputFile = parser.parse_args().inputFile
+endpointName = parser.parse_args().serverName
 # Make sure the endpointName exist
 if len(endpointName) == 0:
     raise Exception('Please input the endpointName')
 
-endpointUrl = input("Enter endpointUrl: ")
+endpointUrl = parser.parse_args().endpointURL
 # Make sure the endpointUrl exist
 if len(endpointUrl) == 0:
     raise Exception('Please input the endpointUrl')
 
-certExist = input("Is certExist? Please input yes or no: ")
+certExist = parser.parse_args().certExist
 
-userIdentitySupport = input("Support userIdentity: Enter 'yes' or 'no' ")
+userIdentitySupport = parser.parse_args().userIdentity
 
-if userIdentitySupport == "yes":
-    userName = input("Enter userName:")
-    password = input("Enter password:")
+if userIdentitySupport:
+    userName = parser.parse_args().userName
+    password = parser.parse_args().password
 else:
     userName = ""
     password = ""
 
-if certExist == "yes":
-    certExist = True
-    print(certExist)
-else:
-    certExist = False
-
-
-print("userName:" + userName )
-print("password:" + password )
+if debugLog:
+    print("inputFile:" + inputFile )
+    print("endpointName:" + endpointName )
+    print("endpointUrl:" + endpointUrl )
+    print("certExist:" + str(certExist ))
+    print("userIdentitySupport:" + str(userIdentitySupport ))
+    print("userName:" + userName )
+    print("password:" + password )
 
 # read the csv file and load into json format
-with open(sys.argv[1]) as csvＦile:
+with open(inputFile) as csvＦile:
     csvReader = csv.reader(csvＦile, delimiter=',')
     lineCount = 0
     nodeData = {}
@@ -74,10 +88,12 @@ with open(sys.argv[1]) as csvＦile:
 
     for row in csvReader:
         if lineCount == 0:
-            print(f'Column names are {", ".join(row)}')
             lineCount += 1
+            if debugLog:
+                print(f'Column names are {", ".join(row)}')
         else:
-            print(f'\t{row[0]} / {row[1]} / {row[2]} ')
+            if debugLog:
+                print(f'\t{row[0]} / {row[1]} / {row[2]} ')
             id = 'ns=2;' + str(row[0])
             nodeData['OpcNodes'].append({
                 'id':id,
@@ -87,9 +103,9 @@ with open(sys.argv[1]) as csvＦile:
             # row[1]: Address
             # row[2]: Data Type
             lineCount += 1
-
-    print(f'Processed {lineCount} lines.')
-    print('nodeData:' + str(nodeData))
+    if debugLog:
+        print(f'Processed {lineCount} lines.')
+        print('nodeData:' + str(nodeData))
 
 # fill in the data into json format
 nodeJsonFile['serInfo'].append(

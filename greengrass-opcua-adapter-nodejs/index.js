@@ -49,13 +49,13 @@ function clearArray(obj) {
     }
 }
 
-function connect_server(serverConfigs,clientOptions)
+function connectServer(serverConfigs, clientOptions, customConfig)
 {
     var i = 0;
     for (i = 0; i < serverConfigs.length; i+=1) {
         if (!serverConfigs[i].connection) {
             let client = new opcua.OPCUAClient(clientOptions);
-            let subscriber = new OPCUASubscriber(client, serverConfigs[i].server, serverConfigs[i].subscriptions);
+            let subscriber = new OPCUASubscriber(client, serverConfigs[i].server, serverConfigs[i].subscriptions, customConfig);
             OPCUASubscriberSet.push(subscriber);
             subscriber.connect();
             serverConfigs[i].connection = true;
@@ -146,7 +146,7 @@ function updateConfig()
                         }
                     }
                 } else {
-                    // set connection flag to true to prevent replicate connect in connect_server()
+                    // set connection flag to true to prevent replicate connect in connectServer()
                     ConfigAgent.ReServerConfigs.find(function(item, index, array) {
                         if (item.server.name === serverName) {
                             item.connection = true;
@@ -156,7 +156,7 @@ function updateConfig()
                 }
             }
             // 2. connect to modified server
-            connect_server(ConfigAgent.ReServerConfigs, ConfigAgent.clientOptions);
+            connectServer(ConfigAgent.ReServerConfigs, ConfigAgent.clientOptions, ConfigAgent.customerOption);
             ConfigAgent.ServerConfigs = ConfigAgent.ReServerConfigs;
             console.log("+++++++++++++++ dump ConfigAgent.ServerConfigs +++++++++++++++");
             dumpServerInfo(ConfigAgent.ReServerConfigs);
@@ -176,6 +176,7 @@ function updateConfig()
 }
 
 ConfigAgent.checkFileLoop(()=> updateConfig());
+console.dir(ConfigAgent.customerOption)
 
 exports.handler = (event, context) => {
     console.log('Not configured to be called');

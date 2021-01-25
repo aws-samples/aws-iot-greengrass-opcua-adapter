@@ -25,12 +25,50 @@ const ConfigAgent = require('./config_agent');
 
 let Opcua;
 let IoTDevice;
+var timeoutObj;
+
+// Dictionary for keeping data.
+var payloadDataMap = {};
+
+function isEmptyObject( obj ) {
+    for ( var name in obj ) {
+        return false;
+    }
+    return true;
+}
+
+function sendDataToCloud(serverConfig, customConfig) {
+    const serverName = serverConfig.name;
+    const awsServerName = serverName.replace(/\#|\?|\+/g,'');
+    const topic = `/opcua/${awsServerName}/node`;
+    let timeout = customConfig.customUploadDataStrategy.pollingInSecond * 1000;
+
+    // Check if the DataMap is not empty.
+    if (!isEmptyObject(payloadDataMap)) {
+        const payloadStr = JSON.stringify(payloadDataMap);
+        console.log(payloadStr);
+        IoTDevice.publish(
+            {
+                topic: topic,
+                payload: payloadStr,
+            },
+            (err) => {
+                if (err) {
+                console.log(`Failed to publish ${payloadStr} on ${topic}. Got the following error: ${err}`);
+                }
+            });
+        // Clear dict.
+        payloadDataMap={};
+    }
+    timeoutObj = setTimeout(sendDataToCloud, timeout, serverConfig, customConfig);
+}
 
 class OPCUASubscriber {
-    constructor(client, serverConfig, monitoredItemsConfig) {
+    constructor(client, serverConfig, monitoredItemsConfig, customConfig) {
         this._client = client;
         this._serverConfig = serverConfig;
         this._monitoredItemsConfig = monitoredItemsConfig;
+        this._customConfig = customConfig;
         const self = this;
         this.on('connect', () => {
             self.createSession();
@@ -40,7 +78,7 @@ class OPCUASubscriber {
         }); 
         this.on('subscribe', () => {
             self.monitorNodes();
-        }); 
+        });
 
         // This is reconnection mechanism inside the OPCUAClient, and
         // There's already a default handle function in OPCUAClient
@@ -58,10 +96,16 @@ class OPCUASubscriber {
             if (connectError) {
                 console.log('Got an error connecting to ', self._serverConfig.url, ' Err: ', connectError);
                 return;
-            }  
+            }
             self.emit('connect');
-        }); 
-    }   
+        });
+
+        // Use this timeout to control issue data to AWS IoT Core if enable the custom strategy.
+        if (self._customConfig.customUploadDataStrategy.enableStrategy) {
+            let timeout = self._customConfig.customUploadDataStrategy.pollingInSecond * 1000;
+            timeoutObj = setTimeout(sendDataToCloud, timeout, self._serverConfig, self._customConfig);
+        }
+    }
 
     disconnect() {
         const self = this;
@@ -71,10 +115,15 @@ class OPCUASubscriber {
                 console.log("OPCUAClient#withClientSession: client disconnect failed ?");
                 console.log('Got an error disconnecting from ', self._serverConfig.url, ' Err: ', err);
             } else {
+                // Clear the timer for sending retained data as well if enable the custom strategy.
+                if (self._customConfig.customUploadDataStrategy.enableStrategy) {
+                    clearTimeout(timeoutObj);
+                }
+
                 self.emit('disconnect');
             }
         });
-    }   
+    }
 
 
     createSession() {
@@ -99,8 +148,8 @@ class OPCUASubscriber {
                 console.log('SessionId: ', session.sessionId.toString());
                 console.log('self._serverConfig.certExist: ', self._serverConfig.certExist);
 
-                // feature to support non-certificate OPCUA Server
-                if (self._serverConfig.certExist === 0) {
+                // Feature to support non-certificate OPCUA Server.
+                if (!self._serverConfig.certExist) {
                     self.emit('session_create');
                 } else {
                     var result = ConfigAgent.compareWithTrustCert(session.serverCertificate);
@@ -184,16 +233,23 @@ class OPCUASubscriber {
                 const awsNodeName = monitoredNodeName.replace(/\#|\?|\+/g,'');
                 const topic = `/opcua/${awsServerName}/node/${awsNodeName}`;
                 const payloadStr = JSON.stringify(payload);
-                IoTDevice.publish(
-                    {
-                        topic: topic,
-                        payload: payloadStr,
-                    },
-                    (err) => {
-                        if (err) {
-                           console.log(`Failed to publish ${payloadStr} on ${topic}. Got the following error: ${err}`);
-                        }
-                    });
+
+                // Keep the received data into dict if enabling the custom strategy.
+                if (self._customConfig.customUploadDataStrategy.enableStrategy) {
+                    payloadDataMap[monitoredNodeName] = dataValue.value.value;
+                    console.dir(payloadDataMap);
+                } else {
+                    IoTDevice.publish(
+                        {
+                            topic: topic,
+                            payload: payloadStr,
+                        },
+                        (err) => {
+                            if (err) {
+                               console.log(`Failed to publish ${payloadStr} on ${topic}. Got the following error: ${err}`);
+                            }
+                        });
+                }
             });
 
             monitoredItem.on('err', (errorMessage) => {
@@ -221,4 +277,3 @@ module.exports = {
         IoTDevice = device;
     },
 };
-

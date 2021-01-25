@@ -55,6 +55,8 @@ var certConfig = {
 
 var timeout = 0;
 
+var customerOption = {"customUploadDataStrategy":{}};
+
 function isEmptyOrWhitespace(value) {
     return (!value || !value.trim());
 }
@@ -102,6 +104,10 @@ function configInit(serverConfigs, callback) {
         clientOptions.connectionStrategy.initialDelay = configList.connectionStrategy.initialDelay;
         clientOptions.connectionStrategy.maxDelay = configList.connectionStrategy.maxDelay;
         clientOptions.checkServerConfigInterval = configList.checkServerConfigInterval;
+
+        customerOption.customUploadDataStrategy = configList.customUploadDataStrategy;
+        console.dir(customerOption);
+
         readFailTolerance = configList.reportTolerance;
         reportStatus = configList.reportStatus;
 
@@ -118,7 +124,7 @@ function configInit(serverConfigs, callback) {
         }
 
         if (isEmptyOrWhitespace(configList.certPath)) {
-            throw new Error("configList[0].certPath is empty or whitespace");
+            throw new Error("configList.certPath is empty or whitespace");
         }
 
         certConfig.certPath = configList.certPath;
@@ -172,9 +178,9 @@ function configInit(serverConfigs, callback) {
 
             // set default is certificate mode if user didn't set certExist in published_nodes.json
             if ( config.certExist ) {
-                serverConfig.server.certExist = config.certExist
+                serverConfig.server.certExist = config.certExist;
             } else {
-                serverConfig.server.certExist = false
+                serverConfig.server.certExist = false;
             }
             console.log(configInit.name + " serverConfig.server.certExist: " + serverConfig.server.certExist);
             serverConfig.server.userIdentity = config.userIdentity;
@@ -255,4 +261,5 @@ module.exports.ReServerConfigs = ReServerConfigs;
 module.exports.clientOptions = clientOptions;
 module.exports.checkFileLoop = checkFileLoop;
 module.exports.compareWithTrustCert = compareWithTrustCert;
+module.exports.customerOption = customerOption;
 
