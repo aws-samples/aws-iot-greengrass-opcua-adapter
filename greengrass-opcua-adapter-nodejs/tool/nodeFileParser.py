@@ -94,7 +94,7 @@ with open(inputFile) as csvＦile:
         else:
             if debugLog:
                 print(f'\t{row[0]} / {row[1]} / {row[2]} ')
-            id = 'ns=2;' + str(row[0])
+            id = 'ns=2;s=' + str(row[0])
             nodeData['OpcNodes'].append({
                 'id':id,
                 'displayName': row[1]
