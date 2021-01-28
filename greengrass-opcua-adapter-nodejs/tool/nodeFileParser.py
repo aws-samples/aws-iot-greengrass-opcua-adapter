@@ -80,8 +80,8 @@ if debugLog:
     print("password:" + password )
 
 # read the csv file and load into json format
-with open(inputFile) as csvＦile:
-    csvReader = csv.reader(csvＦile, delimiter=',')
+with open(inputFile,'r', encoding='UTF-8')  as csvFile:
+    csvReader = csv.reader(csvFile, delimiter=',')
     lineCount = 0
     nodeData = {}
     nodeData['OpcNodes']=[]
