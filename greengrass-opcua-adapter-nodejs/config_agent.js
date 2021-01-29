@@ -27,7 +27,8 @@ const serverConfigfileName = 'published_nodes.json';
 const clientConfigfileName = 'client_config.json';
 const certConfigName = 'cert_config.json';
 const systemStatus = 'system_status.txt';
-const folder = '/etc/greengrass/opcua-adapter/config';
+const folderOptionExternal = '/etc/greengrass/opcua-adapter/config';
+var folder;
 
 var readFailTolerance = 3;
 var readFailTimes = 0;
@@ -63,6 +64,35 @@ function isEmptyOrWhitespace(value) {
 
 function isEmpty(value) {
     return (!value);
+}
+
+function confirmFileExist(path) {
+    if (fs.existsSync(path + '/' + serverConfigfileName) &&
+        fs.existsSync(path + '/' + clientConfigfileName)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @function confirmFilePath
+ * @description This function is used to confirm the path of configurable json file.
+ */
+function confirmFilePath() {
+    // check environment variable path first
+    if (typeof process.env.CONFIG_FILE_PATH != 'undefined' &&
+        !isEmptyOrWhitespace(process.env.CONFIG_FILE_PATH) &&
+        confirmFileExist(process.env.CONFIG_FILE_PATH)) {
+        folder = process.env.CONFIG_FILE_PATH;
+    }
+
+    // check default external path
+    if (isEmptyOrWhitespace(folder) &&
+        confirmFileExist(folderOptionExternal)) {
+        folder = folderOptionExternal;
+    }
+
+    console.log(confirmFilePath.name + ":folder path is " + folder);
 }
 
 /**
@@ -262,4 +292,5 @@ module.exports.clientOptions = clientOptions;
 module.exports.checkFileLoop = checkFileLoop;
 module.exports.compareWithTrustCert = compareWithTrustCert;
 module.exports.customerOption = customerOption;
+module.exports.confirmFilePath = confirmFilePath;
 

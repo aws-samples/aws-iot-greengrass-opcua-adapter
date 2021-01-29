@@ -89,7 +89,7 @@ You could setup many OPC\-UA servers concurrently.
       ``` nodejs
       git apply patch/factories.patch
       ```
-   + Relocate the folder `greengrass-opcua-adapter-nodejs/config` to `/etc/greengrass/opcua-adapter/config` defined in config_agent.js.
+   + Relocate the folder `greengrass-opcua-adapter-nodejs/config` to environment variable `CONFIG_FILE_PATH` defined in [Configure Lambda section](#opcua-configure-lambda) or default external path `/etc/greengrass/opcua-adapter/config`.
    + Download [AWS IoT Greengrass Core SDK Software For Nodejs](https://github.com/aws/aws-greengrass-core-sdk-js/)\. and copy aws-greengrass-core-sdk folder into node_modules folder.
 
       ```console
@@ -164,11 +164,9 @@ You could setup many OPC\-UA servers concurrently.
    Modify the field `certPath` in cert_config\.json, which is used to tell OPC\-UA client the received OPC\-UA server certificate in Certificate List is matched or not:
 
     ```json
-    [
      {
         "certPath": "Directory"
      }
-    ]
     ```
     Once there's no any certificate matched in the `certPath`, then the OPC\-UA client wouldn't go on the communication with the OPC\-UA server.
 
@@ -206,17 +204,32 @@ You could setup many OPC\-UA servers concurrently.
    Create a Greengrass Lambda function\. You can find more details on how to do that in [Configure the Lambda Function for AWS IoT Greengrass](https://docs.aws.amazon.com/greengrass/latest/developerguide/config-lambda.htmlconfig-lambda.md)\. In a nutshell, create a Lambda function code archive by doing the following:
 
    ```console
-   # Archive the whole directory as a zip file
+   # Archive the whole directory as a zip file under 
+   # the folder aws-iot-greengrass-opcua-adapter/greengrass-opcua-adapter-nodejs
+   # ├── Directory
+   # ├── config
+   # ├── config_agent.js
+   # ├── index.js
+   # ├── node_modules
+   # ├── package.json
+   # ├── patch
+   # ├── pics
+   # ├── subscriber.js
+   # └── tool
    zip -r opcuaLambda.zip * -x \*.git\*
    ```
 
    Add this Lambda to your Greengrass Group\. Details are, again, in: [Configure the Lambda Function for AWS IoT Greengrass](https://docs.aws.amazon.com/greengrass/latest/developerguide/config-lambda.html)\.
 
-6. Configure and Deploy the Lambda function to your Greengrass Group
+6. Configure and Deploy the Lambda function to your Greengrass Group<a name="opcua-configure-lambda"></a>
 
    After creating your AWS Lambda function, you add it to your Greengrass Group\. Follow the instructions in same section as above\.
    + Make sure to specify the Lambda function as Long\-Running\.
+   ![\[Greengrass OPCUA Lambda Long-Run.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_long_run.png)
    + Give it at least 64MB of memory size\.
+   ![\[Greengrass OPCUA Lambda Memory.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_memory.png)
+   + Configure the environment variable `CONFIG_FILE_PATH` for configurable json file in Group-specific Lambda configuration.
+   ![\[Greengrass OPCUA configure environment variable.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var.png)
 
    You can now create a deployment with your latest configuration\. You can find details in [Deploy Cloud Configurations to an AWS IoT Greengrass Core Device](https://docs.aws.amazon.com/greengrass/latest/developerguide/configs-core.html)\.
 

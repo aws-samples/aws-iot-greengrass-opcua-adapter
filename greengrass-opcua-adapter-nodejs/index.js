@@ -175,8 +175,10 @@ function updateConfig()
     });
 }
 
+// confirm the configuration file path.
+ConfigAgent.confirmFilePath();
+
 ConfigAgent.checkFileLoop(()=> updateConfig());
-console.dir(ConfigAgent.customerOption)
 
 exports.handler = (event, context) => {
     console.log('Not configured to be called');
