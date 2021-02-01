@@ -80,10 +80,10 @@ function confirmFileExist(path) {
  */
 function confirmFilePath() {
     // check environment variable path first
-    if (typeof process.env.CONFIG_FILE_PATH != 'undefined' &&
-        !isEmptyOrWhitespace(process.env.CONFIG_FILE_PATH) &&
-        confirmFileExist(process.env.CONFIG_FILE_PATH)) {
-        folder = process.env.CONFIG_FILE_PATH;
+    if (typeof process.env.AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH != 'undefined' &&
+        !isEmptyOrWhitespace(process.env.AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH) &&
+        confirmFileExist(process.env.AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH)) {
+        folder = process.env.AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH;
     }
 
     // check default external path

@@ -89,7 +89,7 @@ You could setup many OPC\-UA servers concurrently.
       ``` nodejs
       git apply patch/factories.patch
       ```
-   + Relocate the folder `greengrass-opcua-adapter-nodejs/config` to environment variable `CONFIG_FILE_PATH` defined in [Configure Lambda section](#opcua-configure-lambda) or default external path `/etc/greengrass/opcua-adapter/config`.
+   + Relocate the folder `greengrass-opcua-adapter-nodejs/config` to environment variable `AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH` defined in [Configure Lambda section](#opcua-configure-lambda) or default external path `/etc/greengrass/opcua-adapter/config`.
    + Download [AWS IoT Greengrass Core SDK Software For Nodejs](https://github.com/aws/aws-greengrass-core-sdk-js/)\. and copy aws-greengrass-core-sdk folder into node_modules folder.
 
       ```console
@@ -228,7 +228,7 @@ You could setup many OPC\-UA servers concurrently.
    ![\[Greengrass OPCUA Lambda Long-Run.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_long_run.png)
    + Give it at least 64MB of memory size\.
    ![\[Greengrass OPCUA Lambda Memory.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_memory.png)
-   + Configure the environment variable `CONFIG_FILE_PATH` for configurable json file in Group-specific Lambda configuration.
+   + Configure the environment variable `AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH` for configurable json file in Group-specific Lambda configuration.
    ![\[Greengrass OPCUA configure environment variable.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var.png)
 
    You can now create a deployment with your latest configuration\. You can find details in [Deploy Cloud Configurations to an AWS IoT Greengrass Core Device](https://docs.aws.amazon.com/greengrass/latest/developerguide/configs-core.html)\.
