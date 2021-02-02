@@ -96,7 +96,7 @@ You could setup many OPC\-UA servers concurrently.
       # copy aws-greengrass-core-sdk to node_modules
       git clone https://github.com/aws/aws-greengrass-core-sdk-js.git
       cd aws-greengrass-core-sdk-js/
-      cp -fr aws-greengrass-core-sdk OPCUA-Adapter-For-Multiple-Opcua-Server/greengrass-opcua-adapter-nodejs/node_modules/
+      cp -fr aws-greengrass-core-sdk aws-iot-greengrass-opcua-adapter/greengrass-opcua-adapter-nodejs/node_modules/
       ```
 
    **Note:**
