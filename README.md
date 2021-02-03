@@ -85,6 +85,40 @@ You could setup many OPC\-UA servers concurrently.
       cd greengrass-opcua-adapter-nodejs
       npm install
       ```
+   + Fix the issue happened due to openssl while npm install
+      + The error log would looks like the following:
+      ```
+      reading configuration
+      =====================
+
+      Creating default g_config file  /Your-Path/aws-iot-greengrass-opcua-adapter/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/certificates/config.js
+      configuration =
+         subject                        : /C=FR/ST=IDF/L=Paris/O=NodeOPCUA/CN=NodeOPCUA-TEST
+         validity                       : 5475
+         keySize                        : 2048
+         certificateDir                 : /Your-Path/aws-iot-greengrass-opcua-adapter/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/certificates
+         CAFolder                       : /Your-Path/aws-iot-greengrass-opcua-adapter/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/certificates/CA
+         PKIFolder                      : /Your-Path/aws-iot-greengrass-opcua-adapter/greengrass-opcua-adapter-nodejs/node_modules/node-opcua/certificates/PKI
+         altNames                       :
+         dns                            : f8ffc267b5de.ant.amazon.com
+         ip                             :
+      OpenSSL version :  OpenSSL 1.1.1g  21 Apr 2020
+      ERROR  Command failed: "openssl" genrsa  -out  private/cakey.pem -rand random.rnd 2048
+      Can't load random.rnd into RNG
+      4406738368:error:2406F079:random number generator:RAND_load_file:Cannot open file:crypto/rand/randfile.c:98:Filename=random.rnd
+
+      Command failed: "openssl" genrsa  -out  private/cakey.pem -rand random.rnd 2048
+      Can't load random.rnd into RNG
+      4406738368:error:2406F079:random number generator:RAND_load_file:Cannot open file:crypto/rand/randfile.c:98:Filename=random.rnd
+
+      done ... (0)
+      ```
+      + Fix the error by the patch.
+      ```
+      git apply patch/Fix-the-npm-install-issue-due-to-openssl.patch
+      ```
+
+
    + Patch the factories.js
       ``` nodejs
       git apply patch/factories.patch

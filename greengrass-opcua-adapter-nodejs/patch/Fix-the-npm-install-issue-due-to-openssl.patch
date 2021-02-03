@@ -1,0 +1,29 @@
+diff --git a/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/certificate_authority.js b/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/certificate_authority.js
+index 53463d9..12d1ede 100644
+--- a/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/certificate_authority.js
++++ b/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/certificate_authority.js
+@@ -138,7 +138,7 @@ function construct_CertificateAuthority(done) {
+         // Triple-DES and stored in a PEM format so that it is readable as ASCII text.
+         execute_openssl.bind(null, "genrsa " +
+             " -out  private/cakey.pem" +
+-            " -rand random.rnd" +
++            " -writerand random.rnd" +
+             " 2048",options),
+ 
+         displayTitle.bind(null, "Generate a certificate request for the CA key"),
+diff --git a/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/toolbox.js b/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/toolbox.js
+index 490b02f..6ed3e31 100644
+--- a/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/toolbox.js
++++ b/greengrass-opcua-adapter-nodejs/node_modules/node-opcua-pki/lib/pki/toolbox.js
+@@ -318,7 +318,7 @@ function createPrivateKey(private_key_filename, key_length, callback) {
+     assert([1024, 2048, 4096].indexOf(key_length) >= 0);
+     execute_openssl("genrsa " +
+         " -out " + q(n(private_key_filename)) +
+-        " -rand " + q(n(process.env.RANDFILE)) +
++        " -writerand " + q(n(process.env.RANDFILE)) +
+         " "+ key_length, {}, callback);
+ }
+ 
+-- 
+2.28.0
+
