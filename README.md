@@ -235,7 +235,7 @@ You could setup many OPC\-UA servers concurrently.
 
 5. Upload your Lambda
 
-   Create a Greengrass Lambda function\. You can find more details on how to do that in [Configure the Lambda Function for AWS IoT Greengrass](https://docs.aws.amazon.com/greengrass/latest/developerguide/config-lambda.htmlconfig-lambda.md)\. In a nutshell, create a Lambda function code archive by doing the following:
+   Create a Greengrass Lambda function\. You can find more details on how to do that in [Configure the Lambda Function for AWS IoT Greengrass](https://docs.aws.amazon.com/greengrass/v1/developerguide/config-lambda.html)\. In a nutshell, create a Lambda function code archive by doing the following:
 
    ```console
    # Archive the whole directory as a zip file under 
