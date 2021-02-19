@@ -45,6 +45,7 @@ function sendDataToCloud(serverConfig, customConfig) {
 
     // Check if the DataMap is not empty.
     if (!isEmptyObject(payloadDataMap)) {
+        payloadDataMap['timestamp'] = Date.now();
         const payloadStr = JSON.stringify(payloadDataMap);
         console.log(payloadStr);
         IoTDevice.publish(
@@ -57,8 +58,10 @@ function sendDataToCloud(serverConfig, customConfig) {
                 console.log(`Failed to publish ${payloadStr} on ${topic}. Got the following error: ${err}`);
                 }
             });
-        // Clear dict.
-        payloadDataMap={};
+        // Clear dict if flag sendAllDataToCloud set to false.
+        if (!customConfig.customUploadDataStrategy.sendAllDataToCloud) {
+            payloadDataMap={};
+        }
     }
     timeoutObj = setTimeout(sendDataToCloud, timeout, serverConfig, customConfig);
 }

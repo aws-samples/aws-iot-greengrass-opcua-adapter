@@ -214,7 +214,8 @@ You could setup many OPC\-UA servers concurrently.
    - `customUploadDataStrategy`: The mechanism to keep the received data locally, then it will send them to AWS IoT Core in designated period defined in field `pollingInSecond`.
       - `enableStrategy`: The field used to decide to enable the mechanism or not.
       - `pollingInSecond`: The designated period to send the retained data out to AWS IoT Core.
-      - **Note:** This mechanism only keep the latest data for the same node.
+      - `sendAllDataToCloud`: Set to true in this field used to send all latest received data to AWS IoT Core, otherwise only the received data in the designated time will be sent.
+
     ```json
     {
       "keepSessionAlive": true,
@@ -228,7 +229,8 @@ You could setup many OPC\-UA servers concurrently.
       "reportTolerance": 5,
       "customUploadDataStrategy": {
          "enableStrategy": true,
-         "pollingInSecond": 10
+         "pollingInSecond": 10,
+         "sendAllDataToCloud": true
       }
    }
     ```
@@ -263,7 +265,10 @@ You could setup many OPC\-UA servers concurrently.
    + Give it at least 64MB of memory size\.
    ![\[Greengrass OPCUA Lambda Memory.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_memory.png)
    + Configure the environment variable `AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH` for configurable json file in Group-specific Lambda configuration.
-   ![\[Greengrass OPCUA configure environment variable.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var.png)
+   ![\[Greengrass OPCUA configure environment variable for configuration file path.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_config_file_path.png)
+   + Configure the environment variable `AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD` to `true` to send all latest received data to AWS IoT Core.
+      + This variable is an optional setting, setting it to false or being not to set it will only send the received data in designated period to AWS IoT Core.
+   ![\[Greengrass OPCUA configure environment variable for sending all received data to AWS IoT Cloud.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_config_file_path.png)
 
    You can now create a deployment with your latest configuration\. You can find details in [Deploy Cloud Configurations to an AWS IoT Greengrass Core Device](https://docs.aws.amazon.com/greengrass/latest/developerguide/configs-core.html)\.
 

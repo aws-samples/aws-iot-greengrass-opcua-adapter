@@ -102,7 +102,6 @@ function confirmFilePath() {
  * @param callback - this will be called after finishing loading json configuration,
  *                   the user can take use of loaded configuration to handle connection.
  */
-
 function configInit(serverConfigs, callback) {
     jsonFile.readFile(`${folder}/${clientConfigfileName}`, function (err, configList) {
         if (err) {
@@ -136,6 +135,21 @@ function configInit(serverConfigs, callback) {
         clientOptions.checkServerConfigInterval = configList.checkServerConfigInterval;
 
         customerOption.customUploadDataStrategy = configList.customUploadDataStrategy;
+
+        // Adjust the parameter in customerOption
+        if (isEmpty(customerOption.customUploadDataStrategy.sendAllDataToCloud)) {
+            customerOption.customUploadDataStrategy.sendAllDataToCloud = false;
+        }
+
+        // Replace parameter by environment variable
+        if (typeof process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD != 'undefined') {
+            console.log(configInit.name + ":process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD: " + process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD);
+            if ( process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD == 'true' ) {
+                customerOption.customUploadDataStrategy.sendAllDataToCloud = true;
+            } else {
+                customerOption.customUploadDataStrategy.sendAllDataToCloud = false;
+            }
+        }
         console.dir(customerOption);
 
         readFailTolerance = configList.reportTolerance;
