@@ -85,7 +85,7 @@ You could setup many OPC\-UA servers concurrently.
       cd greengrass-opcua-adapter-nodejs
       npm install
       ```
-   + Fix the issue happened due to openssl while npm install
+   + Fix the issue happened due to openssl while npm install.
       + The error log would looks like the following:
       ```
       reading configuration
@@ -113,9 +113,11 @@ You could setup many OPC\-UA servers concurrently.
 
       done ... (0)
       ```
-      + Fix the error by the patch.
+      + Fix the error by the patch and then npm rebuild.
       ```
       git apply patch/Fix-the-npm-install-issue-due-to-openssl.patch
+
+      npm rebuild
       ```
 
 
@@ -124,14 +126,6 @@ You could setup many OPC\-UA servers concurrently.
       git apply patch/factories.patch
       ```
    + Relocate the folder `greengrass-opcua-adapter-nodejs/config` to environment variable `AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH` defined in [Configure Lambda section](#opcua-configure-lambda) or default external path `/etc/greengrass/opcua-adapter/config`.
-   + Download [AWS IoT Greengrass Core SDK Software For Nodejs](https://github.com/aws/aws-greengrass-core-sdk-js/)\. and copy aws-greengrass-core-sdk folder into node_modules folder.
-
-      ```console
-      # copy aws-greengrass-core-sdk to node_modules
-      git clone https://github.com/aws/aws-greengrass-core-sdk-js.git
-      cd aws-greengrass-core-sdk-js/
-      cp -fr aws-greengrass-core-sdk aws-iot-greengrass-opcua-adapter/greengrass-opcua-adapter-nodejs/node_modules/
-      ```
 
    **Note:**
    + The relocated path must also defined in Lambda configuration in IoT Core console, or the Lambda function wouldn't find the path or have no access right to this path\!
@@ -268,7 +262,7 @@ You could setup many OPC\-UA servers concurrently.
    ![\[Greengrass OPCUA configure environment variable for configuration file path.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_config_file_path.png)
    + Configure the environment variable `AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD` to `true` to send all latest received data to AWS IoT Core.
       + This variable is an optional setting, setting it to false or being not to set it will only send the received data in designated period to AWS IoT Core.
-   ![\[Greengrass OPCUA configure environment variable for sending all received data to AWS IoT Cloud.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_config_file_path.png)
+   ![\[Greengrass OPCUA configure environment variable for sending all received data to AWS IoT Cloud.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_send_all_data.png)
 
    You can now create a deployment with your latest configuration\. You can find details in [Deploy Cloud Configurations to an AWS IoT Greengrass Core Device](https://docs.aws.amazon.com/greengrass/latest/developerguide/configs-core.html)\.
 
