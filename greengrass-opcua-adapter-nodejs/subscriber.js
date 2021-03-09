@@ -191,7 +191,7 @@ class OPCUASubscriber {
         };
 
         const self = this;
-        this._subscription = new Opcua.ClientSubscription(this._session, parameters);
+        this._subscription = Opcua.ClientSubscription.create(this._session, parameters);
         this._subscription.on('started', () => {
             console.log('started subscription :', this._subscription.subscriptionId);
             self.emit('subscribe');
@@ -206,7 +206,7 @@ class OPCUASubscriber {
         const self = this;
         self._monitoredItemsConfig.forEach((monitoredNode) => {
             console.log('monitoring node id = ', monitoredNode.id);
-            const monitoredItem = this._subscription.monitor(
+            this._subscription.monitor(
                 {
                     nodeId: monitoredNode.id,
                     attributeId: Opcua.AttributeIds.Value,
@@ -216,48 +216,50 @@ class OPCUASubscriber {
                     queueSize: 10000,
                     discardOldest: true,
                 },
-                Opcua.read_service.TimestampsToReturn.Both
-            );
-            monitoredItem.on('initialized', () => {
-                console.log('monitoredItem initialized');
-            });
-            monitoredItem.on('changed', (dataValue) => {
-                const monitoredNodeName = monitoredNode.displayName;
-                const serverName = self._serverConfig.name;
-                const time = dataValue.sourceTimestamp;
-                const nodeId = monitoredItem.itemToMonitor.nodeId.toString();
-                const payload = {
-                    id: nodeId,
-                    displayName: monitoredNodeName,
-                    timestamp: time,
-                    value: dataValue.value,
-                };
-                const awsServerName = serverName.replace(/\#|\?|\+/g,'');
-                const awsNodeName = monitoredNodeName.replace(/\#|\?|\+/g,'');
-                const topic = `/opcua/${awsServerName}/node/${awsNodeName}`;
-                const payloadStr = JSON.stringify(payload);
+                Opcua.TimestampsToReturn.Both,
+                (err, monitoredItem) => {
+                    monitoredItem.on('initialized', () => {
+                        console.log('monitoredItem initialized');
+                    });
+                    monitoredItem.on('changed', (dataValue) => {
+                        const monitoredNodeName = monitoredNode.displayName;
+                        const serverName = self._serverConfig.name;
+                        const time = dataValue.sourceTimestamp;
+                        const nodeId = monitoredItem.itemToMonitor.nodeId.toString();
+                        const payload = {
+                            id: nodeId,
+                            displayName: monitoredNodeName,
+                            timestamp: time,
+                            value: dataValue.value,
+                        };
+                        const awsServerName = serverName.replace(/\#|\?|\+/g,'');
+                        const awsNodeName = monitoredNodeName.replace(/\#|\?|\+/g,'');
+                        const topic = `/opcua/${awsServerName}/node/${awsNodeName}`;
+                        const payloadStr = JSON.stringify(payload);
 
-                // Keep the received data into dict if enabling the custom strategy.
-                if (self._customConfig.customUploadDataStrategy.enableStrategy) {
-                    payloadDataMap[monitoredNodeName] = dataValue.value.value;
-                    console.dir(payloadDataMap);
-                } else {
-                    IoTDevice.publish(
-                        {
-                            topic: topic,
-                            payload: payloadStr,
-                        },
-                        (err) => {
-                            if (err) {
-                               console.log(`Failed to publish ${payloadStr} on ${topic}. Got the following error: ${err}`);
-                            }
-                        });
+                        // Keep the received data into dict if enabling the custom strategy.
+                        if (self._customConfig.customUploadDataStrategy.enableStrategy) {
+                            payloadDataMap[monitoredNodeName] = dataValue.value.value;
+                            console.dir(payloadDataMap);
+                        } else {
+                            IoTDevice.publish(
+                                {
+                                    topic: topic,
+                                    payload: payloadStr,
+                                },
+                                (err) => {
+                                    if (err) {
+                                       console.log(`Failed to publish ${payloadStr} on ${topic}. Got the following error: ${err}`);
+                                    }
+                                });
+                        }
+                    });
+
+                    monitoredItem.on('err', (errorMessage) => {
+                        console.log(monitoredItem.itemToMonitor.nodeId.toString(), ' ERROR', errorMessage);
+                    });
                 }
-            });
-
-            monitoredItem.on('err', (errorMessage) => {
-                console.log(monitoredItem.itemToMonitor.nodeId.toString(), ' ERROR', errorMessage);
-            });
+            );
         });
     }
     getServerConfig() {

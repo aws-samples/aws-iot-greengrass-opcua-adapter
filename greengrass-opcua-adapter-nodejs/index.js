@@ -54,7 +54,7 @@ function connectServer(serverConfigs, clientOptions, customConfig)
     var i = 0;
     for (i = 0; i < serverConfigs.length; i+=1) {
         if (!serverConfigs[i].connection) {
-            let client = new opcua.OPCUAClient(clientOptions);
+            let client = opcua.OPCUAClient.create(clientOptions);
             let subscriber = new OPCUASubscriber(client, serverConfigs[i].server, serverConfigs[i].subscriptions, customConfig);
             OPCUASubscriberSet.push(subscriber);
             subscriber.connect();

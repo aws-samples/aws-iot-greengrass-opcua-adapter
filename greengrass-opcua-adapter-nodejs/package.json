@@ -1,7 +1,8 @@
 {
     "dependencies": {
         "jsonfile": "^6.0.1",
-        "node-opcua": "0.0.65",
+        "node-opcua": "2.34.0",
+        "requirish": "^0.3.0",
         "aws-greengrass-core-sdk": "1.7.0"
     }
 }
