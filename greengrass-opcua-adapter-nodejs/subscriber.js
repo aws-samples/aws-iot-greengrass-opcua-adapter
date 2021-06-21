@@ -62,6 +62,19 @@ function sendDataToCloud(serverConfig, customConfig) {
         if (!customConfig.customUploadDataStrategy.sendAllDataToCloud) {
             payloadDataMap={};
         }
+        // Clear dict if flag enableAccumulativeData set to true,
+        // because the accumulative data has been sent (One shot).
+        else if (customConfig.customUploadDataStrategy.enableAccumulativeData)
+        {
+            for( const element of customConfig.customUploadDataStrategy.accumulativeWhiteList )
+            {
+                // Clear key-value
+                if (payloadDataMap.hasOwnProperty(element))
+                {
+                    delete payloadDataMap[element];
+                }
+            }
+        }
     }
     timeoutObj = setTimeout(sendDataToCloud, timeout, serverConfig, customConfig);
 }
@@ -239,7 +252,52 @@ class OPCUASubscriber {
 
                 // Keep the received data into dict if enabling the custom strategy.
                 if (self._customConfig.customUploadDataStrategy.enableStrategy) {
-                    payloadDataMap[monitoredNodeName] = dataValue.value.value;
+                    if (self._customConfig.customUploadDataStrategy.enableAccumulativeData)
+                    {
+                        let dataExist = false;
+                        for( const element of self._customConfig.customUploadDataStrategy.accumulativeWhiteList )
+                        {
+                            if (element === monitoredNodeName )
+                            {
+                                dataExist = true;
+                                // Accumulate the data
+                                if (!(monitoredNodeName in payloadDataMap))
+                                {
+                                    payloadDataMap[monitoredNodeName] = dataValue.value.value+":"+Date.now();
+                                }
+                                else
+                                {
+                                    // Check if it's array or not, if it's array, we just need to push it to array.
+                                    if(Array.isArray(payloadDataMap[monitoredNodeName]))
+                                    {
+                                        payloadDataMap[monitoredNodeName].push(dataValue.value.value+":"+Date.now());
+                                    }
+                                    // It's not a array, create an array to accumulate the data.
+                                    else
+                                    {
+                                        let existingData = [];
+                                        // Push the previous data into array (1st).
+                                        existingData.push(payloadDataMap[monitoredNodeName]);
+                                        // Push the current received data into array.
+                                        existingData.push(dataValue.value.value+":"+Date.now());
+                                        payloadDataMap[monitoredNodeName] = existingData;
+                                    }
+                                }
+                                console.dir(payloadDataMap);
+                                break;
+                            }
+                        }
+
+                        // Node name not in the accumulative white list, then just keep the latest data.
+                        if (!dataExist)
+                        {
+                            payloadDataMap[monitoredNodeName] = dataValue.value.value;
+                        }
+                    }
+                    else
+                    {
+                        payloadDataMap[monitoredNodeName] = dataValue.value.value;
+                    }
                     console.dir(payloadDataMap);
                 } else {
                     IoTDevice.publish(
