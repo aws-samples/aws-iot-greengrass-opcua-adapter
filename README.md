@@ -260,9 +260,15 @@ You could setup many OPC\-UA servers concurrently.
    ![\[Greengrass OPCUA Lambda Memory.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_memory.png)
    + Configure the environment variable `AWS_LAMBDA_OPCUA_ADAPTER_CONFIG_FILE_PATH` for configurable json file in Group-specific Lambda configuration.
    ![\[Greengrass OPCUA configure environment variable for configuration file path.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_config_file_path.png)
-   + Configure the environment variable `AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD` to `true` to send all latest received data to AWS IoT Core.
-      + This variable is an optional setting, setting it to false or being not to set it will only send the received data in designated period to AWS IoT Core.
-   ![\[Greengrass OPCUA configure environment variable for sending all received data to AWS IoT Cloud.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_send_all_data.png)
+   + Configure the environment variable
+      + Set `AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD` to `true` to send all latest received data to AWS IoT Core.
+        + This variable is an optional setting, setting it to false or being not to set it will only send the received data in designated period to AWS IoT Core.
+        ![\[Greengrass OPCUA configure environment variable for sending all received data to AWS IoT Cloud.\]](./greengrass-opcua-adapter-nodejs/pics/OPCUA_Lambda_configuration_env_var_send_all_data.png)
+      + Set `AWS_LAMBDA_OPCUA_ADAPTER_POLL_IN_SECOND` to the number used to overwrite the default setting `pollingInSecond` in [client_config\.json](./greengrass-opcua-adapter-nodejs/config/client_config.json).
+      + Set `AWS_LAMBDA_OPCUA_ADAPTER_ACCUMULATIVE_WHITE_LIST` to configure the candidates to be sent to the cloud after accumulating their data. The candidates in the white list should be separated by a comma such as the following format:
+        ```
+        export AWS_LAMBDA_OPCUA_ADAPTER_ACCUMULATIVE_WHITE_LIST=HXC1:40020,HXC1:40021,HXC1:40022
+        ```
 
    You can now create a deployment with your latest configuration\. You can find details in [Deploy Cloud Configurations to an AWS IoT Greengrass Core Device](https://docs.aws.amazon.com/greengrass/latest/developerguide/configs-core.html)\.
 

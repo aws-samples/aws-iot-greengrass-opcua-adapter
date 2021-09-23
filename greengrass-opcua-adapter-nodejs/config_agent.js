@@ -141,13 +141,33 @@ function configInit(serverConfigs, callback) {
             customerOption.customUploadDataStrategy.sendAllDataToCloud = false;
         }
 
-        // Replace parameter by environment variable
+        // Overwrite the sendAllDataToCloud configuration from environment variable
         if (typeof process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD != 'undefined') {
             console.log(configInit.name + ":process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD: " + process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD);
             if ( process.env.AWS_LAMBDA_OPCUA_ADAPTER_SEND_ALL_DATA_TO_CLOUD == 'true' ) {
                 customerOption.customUploadDataStrategy.sendAllDataToCloud = true;
             } else {
                 customerOption.customUploadDataStrategy.sendAllDataToCloud = false;
+            }
+        }
+
+        // Overwrite the pollingInSecond configuration from environment variable
+        if (typeof process.env.AWS_LAMBDA_OPCUA_ADAPTER_POLL_IN_SECOND != 'undefined') {
+            console.log(configInit.name + ":process.env.AWS_LAMBDA_OPCUA_ADAPTER_POLL_IN_SECOND: " + process.env.AWS_LAMBDA_OPCUA_ADAPTER_POLL_IN_SECOND);
+            if ( !isNaN( process.env.AWS_LAMBDA_OPCUA_ADAPTER_POLL_IN_SECOND ) ) {
+                customerOption.customUploadDataStrategy.pollingInSecond = +process.env.AWS_LAMBDA_OPCUA_ADAPTER_POLL_IN_SECOND;
+            }
+        }
+
+        // Read the accumulative white list from environment variable
+        if (typeof process.env.AWS_LAMBDA_OPCUA_ADAPTER_ACCUMULATIVE_WHITE_LIST != 'undefined') {
+            console.log(configInit.name + ":process.env.AWS_LAMBDA_OPCUA_ADAPTER_ACCUMULATIVE_WHITE_LIST: " + process.env.AWS_LAMBDA_OPCUA_ADAPTER_ACCUMULATIVE_WHITE_LIST);
+            // Check if the environment variable is string
+            if (typeof process.env.AWS_LAMBDA_OPCUA_ADAPTER_ACCUMULATIVE_WHITE_LIST === 'string')
+            {
+                customerOption.customUploadDataStrategy.enableAccumulativeData = true;
+                customerOption.customUploadDataStrategy.accumulativeWhiteList = process.env.AWS_LAMBDA_OPCUA_ADAPTER_ACCUMULATIVE_WHITE_LIST.split(',');
+                console.log("customerOption.customUploadDataStrategy.accumulativeWhiteList.length:"+customerOption.customUploadDataStrategy.accumulativeWhiteList.length);
             }
         }
         console.dir(customerOption);
